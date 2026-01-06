@@ -23,7 +23,14 @@ const AppRoutes = () => (
       }
     />
 
-    
+    <Route
+      path="/admin"
+      element={
+        <ProtectedRoute requireAdmin={true}>
+          <AdminDashboard />
+        </ProtectedRoute>
+      }
+    />
   </Routes>
 );
 
