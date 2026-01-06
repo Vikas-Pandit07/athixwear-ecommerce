@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import "../assets/Dashboard.css";
 import ProductCard from "../components/ProductCard";
 
@@ -11,13 +11,15 @@ const Dashboard = () => {
   const [categories, setCategories] = useState(["All"]);
   const [userInfo, setUserInfo] = useState({ username: "Guest", email: "" });
   const [loading, setLoading] = useState(true);
+  const [userRole, setUserRole] = useState('CUSTOMER');
   const navigate = useNavigate();
 
-  // Fetch data when component loads or category changes
+  // Fetch products and user info on component mount
   useEffect(() => {
-    fetchProducts(); // Get products
-    fetchUserInfo(); // Get user info
-  }, [activeCategory]); // Re-run when activeCategory changes
+    fetchProducts();
+    fetchUserInfo();
+    fetchUserRole();
+  }, [activeCategory]);
 
   const fetchProducts = async () => {
     try {
@@ -48,7 +50,7 @@ const Dashboard = () => {
 
   const fetchUserInfo = async () => {
     try {
-      const response = await fetch("http://localhost:9090/api/user/me", {
+      const response = await fetch("http://localhost:9090/api/user/profile", {
         method: "GET",
         credentials: "include",
       });
@@ -66,18 +68,29 @@ const Dashboard = () => {
     }
   };
 
+  const fetchUserRole = async () => {
+    try {
+      const response = await fetch('http://localhost:9090/api/user/check-role', {
+        method: 'GET',
+        credentials: 'include'
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setUserRole(data.isAdmin ? 'ADMIN' : 'CUSTOMER');
+      }
+    } catch (error) {
+      console.error('Error fetching user role:', error);
+    }
+  };
+
   const handleLogout = async () => {
     try {
-      const response = await fetch("http://localhost:9090/api/auth/logout", {
+      await fetch("http://localhost:9090/api/auth/logout", {
         method: "POST",
         credentials: "include",
       });
-
-      if (response.ok) {
-        navigate("/login", { replace: true });
-      } else {
-        navigate("/login");
-      }
+      navigate("/login", { replace: true });
     } catch (err) {
       console.error("Logout error:", err);
       navigate("/login");
@@ -88,7 +101,7 @@ const Dashboard = () => {
   const filteredProducts = products.filter(product => {
     const matchesCategory = activeCategory === "All" || product.category === activeCategory;
     const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         product.description.toLowerCase().includes(searchTerm.toLowerCase());
+                         (product.description && product.description.toLowerCase().includes(searchTerm.toLowerCase()));
     return matchesCategory && matchesSearch;
   });
 
@@ -106,8 +119,17 @@ const Dashboard = () => {
           <a href="#" className="active">OVERVIEW</a>
           <a href="#">NEW ARRIVALS</a>
           <a href="#">COLLECTIONS</a>
-          <a href="#">ORDERS</a>
+          <Link to="/cart">CART</Link>
+           <a href="#">ORDERS</a>
           <a href="#">WISHLIST</a>
+          
+          {/* Admin Dashboard Link - Only for ADMIN users */}
+          {userRole === 'ADMIN' && (
+            <Link to="/admin" className="admin-nav-link">
+              <span className="admin-badge">⚙️</span> ADMIN PANEL
+            </Link>
+          )}
+          
           <a href="#">MY STATS</a>
           <a href="#">SETTINGS</a>
           <a href="#">SUPPORT</a>
@@ -118,7 +140,9 @@ const Dashboard = () => {
             <div className="avatar">{userInfo.initials || "GU"}</div>
             <div className="user-info">
               <p className="user-name">{userInfo.username}</p>
-              <p className="user-rank">ATHIX ELITE</p>
+              <p className="user-rank">
+                {userRole === 'ADMIN' ? 'ADMIN' : 'ATHIX ELITE'}
+              </p>
             </div>
           </div>
           <button className="logout-btn-sidebar" onClick={handleLogout}>
@@ -136,7 +160,7 @@ const Dashboard = () => {
               </div>
             </button>
             <div className="welcome-text">
-              <h1>WELCOME, {userInfo.username}</h1>
+              <h1>WELCOME, {userInfo.username.toUpperCase()}</h1>
             </div>
           </div>
 
@@ -154,10 +178,17 @@ const Dashboard = () => {
           </div>
 
           <div className="header-right">
-            <div className="cart-container pulse">
+            <Link to="/cart" className="cart-container">
               <span className="cart-icon">🛒</span>
               <span className="cart-count">0</span>
-            </div>
+            </Link>
+            
+            {/* Admin Badge in Header */}
+            {userRole === 'ADMIN' && (
+              <div className="admin-badge-header" title="Administrator">
+                ⚙️
+              </div>
+            )}
           </div>
         </header>
 
@@ -192,6 +223,7 @@ const Dashboard = () => {
                 filteredProducts.map(product => (
                   <div className="product-card-wrapper" key={product.productId}>
                     <ProductCard 
+                      productId={product.productId}
                       image={product.images && product.images.length > 0 ? product.images[0] : "https://images.unsplash.com/photo-1556821840-3a63f95609a7?q=80&w=600"}
                       category={product.category}
                       name={product.name}
@@ -205,11 +237,22 @@ const Dashboard = () => {
                     ? `No products found matching "${searchTerm}"`
                     : "No products available in this category"
                   }
+                  <button 
+                    className="reset-search-btn"
+                    onClick={() => {
+                      setSearchTerm("");
+                      setActiveCategory("All");
+                    }}
+                  >
+                    Reset Filters
+                  </button>
                 </div>
               )}
             </div>
           )}
         </section>
+
+        
       </main>
     </div>
   );
