@@ -22,10 +22,10 @@ public class UserController {
         this.userRepository = userRepository;
     }
 
-    @GetMapping("/me")
-    public ResponseEntity<?> getCurrentUser() {
+    @GetMapping("/profile")
+    public ResponseEntity<?> getUserProfile() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth == null || !auth.isAuthenticated() || "anonymousUser".equals(auth.getPrincipal())) {
+        if (auth == null || !auth.isAuthenticated()) {
             return ResponseEntity.status(401).body(Map.of("error", "Not authenticated"));
         }
 
@@ -38,11 +38,28 @@ public class UserController {
                     "userId", user.getUserId(),
                     "username", user.getUsername(),
                     "email", user.getEmail(),
-                    "role", user.getRole().name(),
-                    "isActive", user.isActive()
+                    "role", user.getRole().name()
             ));
         }
 
         return ResponseEntity.status(404).body(Map.of("error", "User not found"));
+    }
+    
+    @GetMapping("/check-role")
+    public ResponseEntity<?> checkUserRole() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || !auth.isAuthenticated()) {
+            return ResponseEntity.status(401).body(Map.of("authenticated", false));
+        }
+        
+        String username = auth.getName();
+        boolean isAdmin = auth.getAuthorities().stream()
+                .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_ADMIN"));
+        
+        return ResponseEntity.ok(Map.of(
+            "authenticated", true,
+            "username", username,
+            "isAdmin", isAdmin
+        ));
     }
 }
