@@ -5,6 +5,8 @@ import Dashboard from "../pages/Dashboard";
 import ProtectedRoute from "../components/ProtectedRoute";
 import ForgotPassword from "../pages/ForgotPassword";
 import ResetPassword from "../pages/ResetPassword";
+import AdminDashboard from "../pages/AdminDashboard";
+import ProfilePage from "../pages/ProfilePage";
 
 const AppRoutes = () => (
   <Routes>
@@ -22,7 +24,6 @@ const AppRoutes = () => (
         </ProtectedRoute>
       }
     />
-
     <Route
       path="/admin"
       element={
@@ -31,6 +32,15 @@ const AppRoutes = () => (
         </ProtectedRoute>
       }
     />
+
+    <Route
+      path="/profile"
+      element={
+        <ProtectedRoute>
+          <ProfilePage />
+        </ProtectedRoute>
+      }
+      />
   </Routes>
 );
 
