@@ -555,3 +555,215 @@
     box-shadow: 0 0 0 0 rgba(212, 175, 55, 0);
   }
 }
+
+/* Add these styles to your existing Dashboard.css */
+
+
+/* Admin Link in Sidebar */
+.admin-nav-link {
+  display: block;
+  padding: 18px 25px;
+  color: #D4AF37;
+  text-decoration: none;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 2px;
+  font-weight: 700;
+  transition: all 0.3s ease;
+  border-left: 3px solid transparent;
+  background: rgba(212, 175, 55, 0.05);
+}
+
+.admin-nav-link:hover {
+  background: rgba(212, 175, 55, 0.1);
+  border-left-color: #D4AF37;
+  color: #D4AF37;
+}
+
+.admin-badge {
+  margin-right: 10px;
+}
+
+/* Admin Badge in Header */
+.admin-badge-header {
+  width: 40px;
+  height: 40px;
+  background: rgba(212, 175, 55, 0.1);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  margin-left: 15px;
+  cursor: pointer;
+  border: 2px solid #D4AF37;
+}
+
+/* Cart Link Styles */
+.cart-container {
+  position: relative;
+  cursor: pointer;
+  padding: 10px;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  color: inherit;
+  display: inline-block;
+}
+
+.cart-container:hover {
+  background: #f5f5f5;
+}
+
+/* User Stats Section */
+.user-stats-section {
+  padding: 40px;
+  background: #fff;
+  margin-top: 40px;
+  border-top: 1px solid #eee;
+}
+
+.user-stats-section h3 {
+  font-size: 1.4rem;
+  font-weight: 900;
+  color: #111;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  margin-bottom: 30px;
+}
+
+.stats-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 25px;
+}
+
+.stat-card-user {
+  background: #f8f8f8;
+  border-radius: 12px;
+  padding: 25px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+}
+
+.stat-card-user:hover {
+  border-color: #D4AF37;
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.stat-icon-user {
+  font-size: 2rem;
+  width: 60px;
+  height: 60px;
+  background: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stat-details h4 {
+  font-size: 0.9rem;
+  color: #666;
+  font-weight: 600;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.stat-value-user {
+  font-size: 1.8rem;
+  font-weight: 900;
+  color: #111;
+  margin: 0;
+}
+
+/* Reset Search Button */
+.reset-search-btn {
+  background: #111;
+  color: white;
+  border: none;
+  padding: 12px 25px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 20px;
+  text-transform: uppercase;
+  border-radius: 4px;
+}
+
+.reset-search-btn:hover {
+  background: #D4AF37;
+  transform: translateY(-2px);
+}
+
+/* Loading State */
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 100px 20px;
+  text-align: center;
+}
+
+.loading-state .fashion-spinner {
+  width: 50px;
+  height: 50px;
+  margin-bottom: 20px;
+}
+
+.loading-state p {
+  color: #666;
+  font-size: 1rem;
+}
+
+/* No Results */
+.no-results {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 80px 20px;
+  background: #fafafa;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+/* Add to Dashboard.css */
+.cart-container {
+  position: relative;
+  cursor: pointer;
+  padding: 10px;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+}
+
+.cart-container:hover {
+  background: #f5f5f5;
+}
+
+.cart-icon {
+  font-size: 1.4rem;
+}
+
+.cart-count {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background: #D4AF37;
+  color: #000;
+  font-size: 0.7rem;
+  font-weight: 900;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
