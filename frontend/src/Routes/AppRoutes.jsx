@@ -7,6 +7,7 @@ import ForgotPassword from "../pages/ForgotPassword";
 import ResetPassword from "../pages/ResetPassword";
 import AdminDashboard from "../pages/AdminDashboard";
 import ProfilePage from "../pages/ProfilePage";
+import CartPage from "../pages/CartPage";
 
 const AppRoutes = () => (
   <Routes>
@@ -24,6 +25,7 @@ const AppRoutes = () => (
         </ProtectedRoute>
       }
     />
+    
     <Route
       path="/admin"
       element={
@@ -41,6 +43,15 @@ const AppRoutes = () => (
         </ProtectedRoute>
       }
       />
+
+     <Route
+      path="/cart"
+      element={
+        <ProtectedRoute>
+          <CartPage />
+        </ProtectedRoute>
+      }
+    />
   </Routes>
 );
 
