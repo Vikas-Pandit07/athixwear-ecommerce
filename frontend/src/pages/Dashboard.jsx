@@ -12,6 +12,8 @@ const Dashboard = () => {
   const [userInfo, setUserInfo] = useState({ username: "Guest", email: "" });
   const [loading, setLoading] = useState(true);
   const [userRole, setUserRole] = useState('CUSTOMER');
+  const [cartCount, setCartCount] = useState(0);
+
   const navigate = useNavigate();
 
   // Fetch products and user info on component mount
@@ -19,6 +21,7 @@ const Dashboard = () => {
     fetchProducts();
     fetchUserInfo();
     fetchUserRole();
+    fetchCartCount();
   }, [activeCategory]);
 
   const fetchProducts = async () => {
@@ -84,6 +87,23 @@ const Dashboard = () => {
     }
   };
 
+   // Fetch cart count
+  const fetchCartCount = async () => {
+    try {
+      const response = await fetch('http://localhost:9090/api/cart/count', {
+        method: 'GET',
+        credentials: 'include'
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setCartCount(data.count || 0);
+      }
+    } catch (err) {
+      console.error('Error fetching cart count:', err);
+    }
+  };
+
   const handleLogout = async () => {
     try {
       await fetch("http://localhost:9090/api/auth/logout", {
@@ -117,13 +137,15 @@ const Dashboard = () => {
         
         <nav className="sidebar-nav">
           <a href="#" className="active">OVERVIEW</a>
+          <Link to="/cart">MY CART ({cartCount})</Link>
           <a href="#">NEW ARRIVALS</a>
           <a href="#">COLLECTIONS</a>
-          <Link to="/cart">CART</Link>
            <a href="#">ORDERS</a>
           <a href="#">WISHLIST</a>
+
+          <Link to="/profile" className="profile-link">MY PROFILE
+          </Link>
           
-          {/* Admin Dashboard Link - Only for ADMIN users */}
           {userRole === 'ADMIN' && (
             <Link to="/admin" className="admin-nav-link">
               <span className="admin-badge">⚙️</span> ADMIN PANEL
@@ -180,7 +202,9 @@ const Dashboard = () => {
           <div className="header-right">
             <Link to="/cart" className="cart-container">
               <span className="cart-icon">🛒</span>
-              <span className="cart-count">0</span>
+             {cartCount > 0 && (
+              <span className="cart-count">{cartCount}</span>
+             )}
             </Link>
             
             {/* Admin Badge in Header */}
