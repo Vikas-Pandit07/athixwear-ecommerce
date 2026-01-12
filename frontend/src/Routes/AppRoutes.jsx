@@ -52,6 +52,29 @@ const AppRoutes = () => (
         </ProtectedRoute>
       }
     />
+
+   <Route 
+     path="/checkout" 
+     element={
+     <ProtectedRoute>
+       <CheckoutPage />
+     </ProtectedRoute>
+    } 
+   />
+
+   <Route 
+     path="/order-confirmation/:orderId"
+     element={
+    <ProtectedRoute>
+      <OrderConfirmation />
+    </ProtectedRoute>
+    } 
+   />
+  <Route 
+    path="/product/:productId"
+    element={<ProductDetailPage />
+    } 
+  />
   </Routes>
 );
 
