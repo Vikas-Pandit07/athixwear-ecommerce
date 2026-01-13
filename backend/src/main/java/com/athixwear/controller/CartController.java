@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,6 +25,7 @@ import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/cart")
+@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 public class CartController {
 	
 	private final CartService cartService;
@@ -94,13 +96,13 @@ public class CartController {
     }
 	
 	// remove item from cart
-	@DeleteMapping("/item/{itemId}")
+	@DeleteMapping("/items/{itemId}")
 	public ResponseEntity<?> removeItemFromCart(@PathVariable Integer itemId) {
 		try {
 			cartService.removeCartItem(itemId);
 			return ResponseEntity.ok().body(Map.of("message", "Item removed from cart"));
 		} catch (Exception e) {
-			return ResponseEntity.badRequest().body(Map.of("erro", e.getMessage()));
+			return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
 		}
 	}
 	
