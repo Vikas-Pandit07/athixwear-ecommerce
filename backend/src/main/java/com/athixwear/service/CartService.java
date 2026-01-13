@@ -29,31 +29,27 @@ public class CartService {
 	private final CartRepository cartRepository;
 	private final CartItemRepository cartItemRepository;
 	private final ProductRepository productRepository;
-	private final UserRepository userRepository;
+	 private final UserService userService;
 	private final ProductImageRepository productImageRepository;
-	
-	public CartService(CartRepository cartRepository,
-			CartItemRepository cartItemRepository, ProductRepository productRepository, UserRepository userRepository,
+
+	public CartService(CartRepository cartRepository, CartItemRepository cartItemRepository,
+			ProductRepository productRepository, UserService userService,
 			ProductImageRepository productImageRepository) {
 		super();
 		this.cartRepository = cartRepository;
 		this.cartItemRepository = cartItemRepository;
 		this.productRepository = productRepository;
-		this.userRepository = userRepository;
+		this.userService = userService;
 		this.productImageRepository = productImageRepository;
 	}
 
 	// Get current authenticated user
     private User getCurrentUser() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String username = auth.getName();
-        
-        return userRepository.findByUsername(username)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        return userService.getCurrentUser();
     }
 	
 	// get or create cart for user
-	private Cart getOrCreateCart(User user) {
+	public Cart getOrCreateCart(User user) {
 		Cart cart = cartRepository.findByUser_UserId(user.getUserId());
 		if (cart == null) {
 			cart = new Cart();
