@@ -5,19 +5,20 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public class OrderResponse {
-	private Long orderId;
+	private Integer orderId;
 	private BigDecimal totalAmount;
 	private String orderStatus;
 	private String paymentStatus;
 	private LocalDateTime orderDate;
 	private String paymentMethod;
-	private String shippingAddress;
+	private AddressResponse shippingAddress;
 	private List<OrderItemResponse> items;
-	public Long getOrderId() {
+
+	public Integer getOrderId() {
 		return orderId;
 	}
-	public void setOrderId(Long orderId) {
-		this.orderId = orderId;
+	public void setOrderId(Integer integer) {
+		this.orderId = integer;
 	}
 	public BigDecimal getTotalAmount() {
 		return totalAmount;
@@ -49,11 +50,11 @@ public class OrderResponse {
 	public void setPaymentMethod(String paymentMethod) {
 		this.paymentMethod = paymentMethod;
 	}
-	public String getShippingAddress() {
+	public AddressResponse getShippingAddress() {
 		return shippingAddress;
 	}
-	public void setShippingAddress(String shippingAddress) {
-		this.shippingAddress = shippingAddress;
+	public void setShippingAddress(AddressResponse addressResponse) {
+		this.shippingAddress = addressResponse;
 	}
 	public List<OrderItemResponse> getItems() {
 		return items;
@@ -61,5 +62,4 @@ public class OrderResponse {
 	public void setItems(List<OrderItemResponse> items) {
 		this.items = items;
 	}
-	
 }
