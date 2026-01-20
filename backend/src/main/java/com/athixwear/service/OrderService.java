@@ -1,6 +1,9 @@
 package com.athixwear.service;
 
+import com.athixwear.dto.AddressResponse;
 import com.athixwear.dto.CheckoutRequest;
+import com.athixwear.dto.OrderItemResponse;
+import com.athixwear.dto.OrderResponse;
 import com.athixwear.entity.*;
 import com.athixwear.repository.*;
 import org.springframework.stereotype.Service;
@@ -10,6 +13,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class OrderService {
@@ -21,28 +25,30 @@ public class OrderService {
     private final AddressRepository addressRepository;
     private final CartItemRepository cartItemRepository;
     private final ProductRepository productRepository;
+    private final ProductImageRepository productImageRepository;
     
-    public OrderService(CartService cartService, UserService userService,
-                       OrderRepository orderRepository, OrderItemRepository orderItemRepository,
-                       AddressRepository addressRepository, CartItemRepository cartItemRepository,
-                       ProductRepository productRepository) {
-        this.cartService = cartService;
-        this.userService = userService;
-        this.orderRepository = orderRepository;
-        this.orderItemRepository = orderItemRepository;
-        this.addressRepository = addressRepository;
-        this.cartItemRepository = cartItemRepository;
-        this.productRepository = productRepository;
-    }
+    public OrderService(CartService cartService, UserService userService, OrderRepository orderRepository,
+			OrderItemRepository orderItemRepository, AddressRepository addressRepository,
+			CartItemRepository cartItemRepository, ProductRepository productRepository,
+			ProductImageRepository productImageRepository) {
+		super();
+		this.cartService = cartService;
+		this.userService = userService;
+		this.orderRepository = orderRepository;
+		this.orderItemRepository = orderItemRepository;
+		this.addressRepository = addressRepository;
+		this.cartItemRepository = cartItemRepository;
+		this.productRepository = productRepository;
+		this.productImageRepository = productImageRepository;
+	}
     
     @Transactional
-    public Order createOrder(CheckoutRequest request) {
+    public OrderResponse createOrder(CheckoutRequest request) {
         User user = userService.getCurrentUser();
         
         // Get user's cart items
-        List<CartItem> cartItems = cartItemRepository.findByCart(
-            cartService.getOrCreateCart(user)
-        );
+        Cart cart = cartService.getOrCreateCart(user);
+        List<CartItem> cartItems = cartItemRepository.findByCart(cart);
         
         if (cartItems.isEmpty()) {
             throw new RuntimeException("Cart is empty");
@@ -62,11 +68,6 @@ public class OrderService {
         // Get address
         Address address = addressRepository.findById(request.getAddressId())
                 .orElseThrow(() -> new RuntimeException("Address not found"));
-        
-        // Verify address belongs to user
-        if (!address.getUser().getUserId().equals(user.getUserId())) {
-            throw new RuntimeException("Invalid address");
-        }
         
         // Create order
         Order order = new Order();
@@ -94,31 +95,86 @@ public class OrderService {
             
             // Update product stock
             Product product = cartItem.getProduct();
-            product.setStock(product.getStock() - cartItem.getQuantity());
+            int newStock = product.getStock() - cartItem.getQuantity();
+            
+            if (newStock < 0) {
+                throw new RuntimeException("Insufficient stock for product: " + product.getName());
+            }
+            
+            product.setStock(newStock);
             productRepository.save(product);
         }
         
         // Clear cart after order
         cartService.clearCart();
         
-        return savedOrder;
+        return getOrderResponse(savedOrder);
     }
     
-    public List<Order> getUserOrders() {
+    public List<OrderResponse> getUserOrders() {
         User user = userService.getCurrentUser();
-        return orderRepository.findByUserUserId(user.getUserId());
+        List<Order> orders = orderRepository.findByUserUserId(user.getUserId());
+        return orders.stream()
+                .map(this::getOrderResponse)
+                .collect(Collectors.toList());
     }
     
-    public Order getOrderById(Long orderId) {
+    public OrderResponse getOrderById(Integer orderId) {
         User user = userService.getCurrentUser();
-        Order order = orderRepository.findById(orderId)
+        Order order = orderRepository.findByOrderIdAndUserUserId(orderId, user.getUserId())
                 .orElseThrow(() -> new RuntimeException("Order not found"));
         
-        // Verify order belongs to user
-        if (!order.getUser().getUserId().equals(user.getUserId())) {
-            throw new RuntimeException("Not authorized to view this order");
+        return getOrderResponse(order);
+    }
+    
+    private OrderResponse getOrderResponse(Order order) {
+    	OrderResponse response = new OrderResponse();
+    	 response.setOrderId(order.getOrderId());
+         response.setTotalAmount(order.getTotalAmount());
+         response.setOrderStatus(order.getOrderStatus().name());
+         response.setPaymentStatus(order.getPaymentStatus().name());
+         response.setPaymentMethod(order.getPaymentMethod());
+         response.setOrderDate(order.getOrderDate());
+         
+         AddressResponse addressResponse = new AddressResponse();
+         Address address = order.getAddress();
+         addressResponse.setAddressId(address.getAddressId());
+         addressResponse.setFullName(address.getFullName());
+         addressResponse.setPhone(address.getPhone());
+         addressResponse.setAddressLine(address.getAddressLine());
+         addressResponse.setCity(address.getCity());
+         addressResponse.setState(address.getState());
+         addressResponse.setPinCode(address.getPinCode());
+         addressResponse.setCountry(address.getCountry());
+         addressResponse.setDefault(address.isDefault());
+         response.setShippingAddress(addressResponse);
+         
+         // Set order items
+         List<OrderItem> orderItems = orderItemRepository.findByOrderOrderId(order.getOrderId());
+         List<OrderItemResponse> itemResponses = orderItems.stream()
+                 .map(this::getOrderItemResponse)
+                 .collect(Collectors.toList());
+         response.setItems(itemResponses);
+         
+         return response;
+     }
+    
+    private OrderItemResponse getOrderItemResponse(OrderItem orderItem) {
+        OrderItemResponse response = new OrderItemResponse();
+        response.setOrderItemId(orderItem.getOrderItemId());
+        response.setProductId(orderItem.getProduct().getProductId());
+        response.setProductName(orderItem.getProduct().getName());
+        response.setQuantity(orderItem.getQuantity());
+        response.setPrice(orderItem.getPrice());
+        response.setTotalPrice(orderItem.getTotalPrice());
+        
+        // Get product image
+        List<ProductImage> images = productImageRepository
+                .findByProduct_ProductId(orderItem.getProduct().getProductId());
+        if (!images.isEmpty()) {
+            response.setProductImage(images.get(0).getImageUrl());
         }
         
-        return order;
+        return response;
     }
 }
