@@ -19,8 +19,9 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     // Find all orders for a user
     List<Order> findByUserUserId(Integer userId);
     
-    // Find orders by user with pagination
-    List<Order> findByUserUserIdOrderByOrderDateDesc(Integer userId);
+ // Find order by ID and user ID (for security)
+    Optional<Order> findByOrderIdAndUserUserId(Integer orderId, Integer userId);
+
     
     // Find order by Razorpay order ID
     Optional<Order> findByRazorpayOrderId(String razorpayOrderId);
