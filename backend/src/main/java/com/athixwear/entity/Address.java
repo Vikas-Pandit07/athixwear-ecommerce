@@ -31,7 +31,26 @@ public class Address {
     private String state;
     private String pinCode;
     private String country;
-    private boolean isDefault;
+    private boolean isDefault = false;
+	@Column(name = "is_active")
+    private boolean isActive = true; 
+    
+    @Column(name = "created_at", updatable = false)
+    private LocalDateTime createdAt;
+    
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+    
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
+    }
+    
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
 	public Integer getAddressId() {
 		return addressId;
 	}
@@ -91,5 +110,23 @@ public class Address {
 	}
 	public void setDefault(boolean isDefault) {
 		this.isDefault = isDefault;
+	}
+	public boolean isActive() { 
+		return isActive; 
+	} 
+    public void setActive(boolean isActive) { 
+		this.isActive = isActive; 
+	}      
+    public LocalDateTime getCreatedAt() { 
+		return createdAt;
+	}
+    public void setCreatedAt(LocalDateTime createdAt) {
+		this.createdAt = createdAt; 
+	}
+    public LocalDateTime getUpdatedAt() {
+		return updatedAt; 
+	}
+    public void setUpdatedAt(LocalDateTime updatedAt) { 
+		this.updatedAt = updatedAt; 
 	}
 }
