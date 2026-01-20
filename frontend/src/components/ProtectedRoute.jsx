@@ -1,10 +1,12 @@
-// ProtectedRoute.js - Update to handle admin routes
 import React, { useEffect, useState } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 
 const ProtectedRoute = ({ children, requireAdmin = false }) => {
   const [loading, setLoading] = useState(true);
-  const [authData, setAuthData] = useState(null);
+  const [authStatus, setAuthStatus] = useState({
+    authenticated: false,
+    isAdmin: false
+  });
   const location = useLocation();
 
   useEffect(() => {
@@ -18,47 +20,56 @@ const ProtectedRoute = ({ children, requireAdmin = false }) => {
         const data = await response.json();
         
         if (response.ok && data.authenticated) {
-          setAuthData(data);
-          
-          // Check if admin role is required but user is not admin
-          if (requireAdmin && !data.isAdmin) {
-            setAuthData({ ...data, authorized: false });
-          } else {
-            setAuthData({ ...data, authorized: true });
-          }
+          setAuthStatus({
+            authenticated: true,
+            isAdmin: data.isAdmin || false
+          });
         } else {
-          setAuthData({ authenticated: false, authorized: false });
+          setAuthStatus({
+            authenticated: false,
+            isAdmin: false
+          });
         }
       } catch (error) {
         console.error("Auth check failed:", error);
-        setAuthData({ authenticated: false, authorized: false });
+        setAuthStatus({
+          authenticated: false,
+          isAdmin: false
+        });
       } finally {
         setLoading(false);
       }
     };
 
     checkAuth();
-  }, [requireAdmin]);
+  }, []);
 
   if (loading) {
     return (
-      <div className="loading-screen">
-        <div className="fashion-spinner"></div>
-        <p>Checking authorization...</p>
+      <div className="auth-loading-screen">
+        <div className="loading-animation">
+          <div className="fashion-spinner large"></div>
+          <div className="loading-text">
+            <h3>ATHIX WEAR</h3>
+            <p>Checking authentication...</p>
+          </div>
+        </div>
       </div>
     );
   }
 
-  if (!authData?.authenticated) {
+  if (!authStatus.authenticated) {
     return <Navigate to="/login" replace state={{ from: location }} />;
   }
 
-  if (requireAdmin && !authData?.authorized) {
+  if (requireAdmin && !authStatus.isAdmin) {
     return (
-      <div className="unauthorized">
-        <h2>Access Denied</h2>
-        <p>Admin privileges required to access this page.</p>
-        <Navigate to="/dashboard" replace />
+      <div className="unauthorized-page">
+        <div className="unauthorized-content">
+          <h2>🔒 Access Restricted</h2>
+          <p>Administrator privileges required to access this page.</p>
+          <Navigate to="/dashboard" replace />
+        </div>
       </div>
     );
   }
