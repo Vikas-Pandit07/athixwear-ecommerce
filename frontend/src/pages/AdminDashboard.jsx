@@ -1,7 +1,6 @@
-// AdminDashboard.js
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import '../assets/AdminDashboard.css';
+import '../assets/css/admin.css';
 
 const AdminDashboard = () => {
   const [stats, setStats] = useState(null);
@@ -26,7 +25,6 @@ const AdminDashboard = () => {
         setStats(data);
       } else if (response.status === 403) {
         setError('Access denied. Admin privileges required.');
-        // Redirect to regular dashboard after 2 seconds
         setTimeout(() => {
           navigate('/dashboard');
         }, 2000);
