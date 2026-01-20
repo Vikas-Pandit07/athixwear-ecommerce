@@ -12,26 +12,29 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface AddressRepository extends JpaRepository<Address, Long> {
+public interface AddressRepository extends JpaRepository<Address, Integer> {
     
-    // Find all addresses for a user
+    // Find only active addresses for a user
+    List<Address> findByUserUserIdAndIsActiveTrue(Integer userId);
+    
+    // Find all addresses (including inactive) - for admin
     List<Address> findByUserUserId(Integer userId);
     
-    // Find default address for a user
-    Optional<Address> findByUserUserIdAndIsDefaultTrue(Integer userId);
+    // Find default address for a user (only active)
+    Optional<Address> findByUserUserIdAndIsDefaultTrueAndIsActiveTrue(Integer userId);
     
-    // Find addresses by user and city
-    List<Address> findByUserUserIdAndCity(Integer userId, String city);
+    // Find by ID and user (only active)
+    Optional<Address> findByAddressIdAndUserUserIdAndIsActiveTrue(Integer addressId, Integer userId);
+    
+    // Soft delete - mark as inactive
+    @Modifying
+    @Transactional
+    @Query("UPDATE Address a SET a.isActive = false, a.isDefault = false WHERE a.addressId = :addressId AND a.user.userId = :userId")
+    int deactivateAddress(@Param("addressId") Integer addressId, @Param("userId") Integer userId);
     
     // Clear all default addresses for a user
     @Modifying
     @Transactional
-    @Query("UPDATE Address a SET a.isDefault = false WHERE a.user.userId = :userId")
+    @Query("UPDATE Address a SET a.isDefault = false WHERE a.user.userId = :userId AND a.isActive = true")
     void clearDefaultAddresses(@Param("userId") Integer userId);
-    
-    // Count addresses for a user
-    long countByUserUserId(Integer userId);
-    
-    // Delete all addresses for a user
-    void deleteByUserUserId(Integer userId);
 }
