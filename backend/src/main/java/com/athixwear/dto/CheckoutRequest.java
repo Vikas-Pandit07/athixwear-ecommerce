@@ -6,16 +6,16 @@ import jakarta.validation.constraints.NotNull;
 public class CheckoutRequest {
     
     @NotNull
-    private Long addressId;
+    private Integer addressId;
     
     @NotBlank
     private String paymentMethod; // "COD", "RAZORPAY"
     
-    public Long getAddressId() {
+    public Integer getAddressId() {
         return addressId;
     }
     
-    public void setAddressId(Long addressId) {
+    public void setAddressId(Integer addressId) {
         this.addressId = addressId;
     }
     
