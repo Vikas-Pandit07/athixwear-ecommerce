@@ -139,4 +139,8 @@ const OrderConfirmation = () => {
   );
 };
 
+<<<<<<< HEAD
 export default OrderConfirmation;
+=======
+export default OrderConfirmation;
+>>>>>>> b04245a95cc194701d9aa0c1fa5fd9f17998d0a7

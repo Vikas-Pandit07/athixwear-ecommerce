@@ -216,8 +216,11 @@ const CheckoutPage = () => {
           text: data.message || "Order placed successfully!",
         });
 
+<<<<<<< HEAD
       
 
+=======
+>>>>>>> b04245a95cc194701d9aa0c1fa5fd9f17998d0a7
         setTimeout(() => {
           navigate(`/order-confirmation/${data.orderId}`);
         }, 2000);
