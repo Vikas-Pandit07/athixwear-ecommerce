@@ -39,6 +39,7 @@ public class JwtFilter extends OncePerRequestFilter {
             for (Cookie cookie : request.getCookies()) {
                 if ("JWT_TOKEN".equals(cookie.getName())) {
                     token = cookie.getValue();
+                    break;
                 }
             }
         }
@@ -47,13 +48,17 @@ public class JwtFilter extends OncePerRequestFilter {
             String username = jwtService.extractUsername(token);
             userRepository.findByUsername(username).ifPresent(user -> {
             	
-            	// create authoriteis based on role
+            	// create authoriteis based on user role
             	Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
             	authorities.add(new SimpleGrantedAuthority("ROLE_" + user.getRole().name()));
             	
+            	// Create authentication token with authorities
                 UsernamePasswordAuthenticationToken auth =
                         new UsernamePasswordAuthenticationToken(
-                                user.getUsername(), null, null);
+                                user.getUsername(), 
+                                null, 
+                                authorities);
+                
                 SecurityContextHolder.getContext().setAuthentication(auth);
             });
         }

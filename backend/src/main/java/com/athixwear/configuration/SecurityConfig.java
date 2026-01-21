@@ -34,9 +34,14 @@ public class SecurityConfig {
             				    "/api/auth/verify",
             				    "/api/products/**"
             		).permitAll()
-            		.requestMatchers("/api/admin/**").hasRole("ADMIN")
-            		.requestMatchers("/api/user/**").hasAnyRole("ADMIN", "CUSTOMER")
-            		.anyRequest().authenticated()
+            		 // Admin endpoints - require ADMIN role
+                    .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                    
+                    // User endpoints - require authentication
+                    .requestMatchers("/api/user/**", "/api/cart/**", "/api/orders/**").authenticated()
+                    
+                    // All other requests need authentication
+                    .anyRequest().authenticated()
             )
             .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
