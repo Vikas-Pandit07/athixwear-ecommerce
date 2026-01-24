@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface OrderRepository extends JpaRepository<Order, Long> {
+public interface OrderRepository extends JpaRepository<Order, Integer> {
     
     // Find all orders for a user
     List<Order> findByUserUserId(Integer userId);
@@ -29,9 +29,9 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     @Query("SELECT DISTINCT o FROM Order o JOIN o.orderItems oi WHERE oi.product.productId = :productId")
     List<Order> findOrdersByProductId(@Param("productId") Integer productId);
     
-    // Find recent orders (last 30 days)
-    @Query("SELECT o FROM Order o ORDER BY o.orderDate DESC LIMIT 10")
-    List<Order> findRecentOrders();
+    // Find recent orders 
+    @Query("SELECT o FROM Order o WHERE o.orderDate >= :date")
+    List<Order> findRecentOrders(@Param("date") LocalDateTime date);
     
     // Count orders by user
     long countByUserUserId(Integer userId);

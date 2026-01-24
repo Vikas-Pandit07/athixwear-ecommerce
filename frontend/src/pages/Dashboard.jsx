@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import "../assets/css/dashboard.css";
+import "../assets/css/dashboard.css"
 import ProductCard from "../components/ui/ProductCard";
 
 const Dashboard = () => {

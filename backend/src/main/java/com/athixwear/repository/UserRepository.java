@@ -1,5 +1,6 @@
 package com.athixwear.repository;
 
+import com.athixwear.entity.Role;
 import com.athixwear.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -24,6 +25,5 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     Optional<User> findByUsernameAndActiveTrue(String username);
     
     // total user count by role
-    @Query("SELECT COUNT(u) FROM User u WHERE u.role = :role")
-    Long countByRole(@Param("role") String role);
+    Long countByRole(@Param("role") Role  role);
 }

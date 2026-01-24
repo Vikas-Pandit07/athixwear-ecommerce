@@ -1,9 +1,11 @@
 package com.athixwear.controller.admin;
 
 import com.athixwear.dto.admin.AdminStatsResponse;
+import com.athixwear.entity.User;
 import com.athixwear.service.admin.AdminService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -13,6 +15,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/admin")
 @CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
+@PreAuthorize("hasRole('ADMIN')")
 public class AdminController {
     
     private final AdminService adminService;
@@ -22,13 +25,13 @@ public class AdminController {
     }
     
     @GetMapping("/stats")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> getDashboardStats() {
+    public ResponseEntity<?> getDashboardStats(@AuthenticationPrincipal User user) {  // Removed @RequestParam Role userRole
         try {
             AdminStatsResponse stats = adminService.getDashboardStats();
             
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
+            response.put("message", "Dashboard stats fetched successfully");
             response.put("stats", stats);
             response.put("timestamp", System.currentTimeMillis());
             
@@ -37,7 +40,8 @@ public class AdminController {
             Map<String, Object> errorResponse = new HashMap<>();
             errorResponse.put("success", false);
             errorResponse.put("error", "Failed to fetch dashboard statistics");
-            errorResponse.put("details", e.getMessage());
+            errorResponse.put("message", e.getMessage());
+            errorResponse.put("details", e.toString());
             
             return ResponseEntity.internalServerError().body(errorResponse);
         }
@@ -45,7 +49,6 @@ public class AdminController {
     
     //  Recent orders for dashboard
     @GetMapping("/orders/recent")
-    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> getRecentOrders() {
         try {
             Map<String, Object> order1 = Map.of(
@@ -56,9 +59,17 @@ public class AdminController {
                 "date", "2024-01-15"
             );
             
+            Map<String, Object> order2 = Map.of(
+                    "orderId", 1002,
+                    "customer", "Jane Smith",
+                    "amount", 1800,
+                    "status", "PROCESSING",
+                    "date", "2024-01-14"
+                );
+            
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
-            response.put("orders", List.of(order1));
+            response.put("orders", List.of(order1, order2));
             
             return ResponseEntity.ok(response);
         } catch (Exception e) {
@@ -70,7 +81,6 @@ public class AdminController {
     }
     
     @GetMapping("/customers/recent")
-    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> getRecentCustomers() {
     	try {
             Map<String, Object> customer1 = Map.of(
@@ -81,9 +91,17 @@ public class AdminController {
                 "orders", "5"
             );
             
+            Map<String, Object> customer2 = Map.of(
+                    "customerId", 102,
+                    "name", "Merry Franso",
+                    "email", "merry@gmail.com",
+                    "joinDate", "2026-01-25",
+                    "orderCount", 2
+                );
+            
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
-            response.put("orders", List.of(customer1));
+            response.put("orders", List.of(customer1, customer2));
             
             return ResponseEntity.ok(response);
         } catch (Exception e) {
@@ -95,7 +113,6 @@ public class AdminController {
     }
     
     @GetMapping("/products/top")
-    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> getTopProducts() {
     	try {
             Map<String, Object> product1 = Map.of(
@@ -105,9 +122,16 @@ public class AdminController {
                 "revenue", 20000
             );
             
+            Map<String, Object> product2 = Map.of(
+                    "productId", 102,
+                    "name", "Red Snecker",
+                    "soldCount", 25,
+                    "revenue", 40000
+                    
+            );
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
-            response.put("orders", List.of(product1));
+            response.put("products", List.of(product1, product2));
             
             return ResponseEntity.ok(response);
         } catch (Exception e) {

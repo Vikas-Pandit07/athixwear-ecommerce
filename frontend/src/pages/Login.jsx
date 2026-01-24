@@ -27,10 +27,10 @@ const Login = () => {
       if (response.ok) {
         navigate("/dashboard", {replace: true});
       } else {
-        setError(data.error || "Login failed");
+        setError(data.error || "Login failed. Please check your credentials.");
       }
     } catch (err) {
-      setError("Server not reachable. Please try again.");
+      setError("Server not reachable. Please try again later.");
     } finally {
       setLoading(false);
     }

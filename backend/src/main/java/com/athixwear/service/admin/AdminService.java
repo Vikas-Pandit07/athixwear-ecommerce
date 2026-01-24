@@ -7,6 +7,8 @@ import org.eclipse.angus.mail.handlers.message_rfc822;
 import org.springframework.stereotype.Service;
 import com.athixwear.controller.AddressController;
 import com.athixwear.dto.admin.AdminStatsResponse;
+import com.athixwear.entity.OrderStatus;
+import com.athixwear.entity.Role;
 import com.athixwear.repository.OrderItemRepository;
 import com.athixwear.repository.OrderRepository;
 import com.athixwear.repository.ProductRepository;
@@ -20,7 +22,7 @@ public class AdminService {
 	private final OrderRepository orderRepository;
 	private final UserRepository userRepository;
 	private final ProductRepository productRepository;
-	private OrderItemRepository orderItemRepository;
+	private final OrderItemRepository orderItemRepository;
 	
 	public AdminService(OrderRepository orderRepository, UserRepository userRepository,
 			ProductRepository productRepository, OrderItemRepository orderItemRepository, AddressController addressController) {
@@ -35,31 +37,38 @@ public class AdminService {
 	public AdminStatsResponse getDashboardStats() {
 		AdminStatsResponse response = new AdminStatsResponse();
 		
+		try {
             // 1. BASIC COUNTS
-            Long customerCount = userRepository.countByRole("CUSTOMER");
-            response.setTotalCustomers(customerCount);
+            Long customerCount = userRepository.countByRole(Role.CUSTOMER);
+            response.setTotalCustomers(customerCount != null ? customerCount : 0L);
             
             Long productCount = productRepository.count();
-            response.setTotalProducts(productCount);
+            response.setTotalProducts(productCount != null ? productCount : 0L);
             
             // 2. ORDER STATISTICS
             List<Object[]> orderStats = orderRepository.getOrderStatistics();
             
+            response.setPendingOrders(0L);
+            response.setProcessingOrders(0L); // This combines CONFIRMED and SHIPPED
+            response.setDeliveredOrders(0L);
+            response.setCancelledOrders(0L);
+            
             for (Object[] stat : orderStats) {
-            	String status = (String) stat[0];
+            	OrderStatus status = (OrderStatus) stat[0];
             	Long count = (Long) stat[1];
             	
             	switch (status) {
-            	 case "PENDING":
+            	 case PENDING:
                      response.setPendingOrders(count.longValue());
                      break;
-                 case "PROCESSING":
-                     response.setProcessingOrders(count.longValue());
+            	 case CONFIRMED:
+            	 case SHIPPED:
+                     response.setProcessingOrders(response.getProcessingOrders() + count.longValue());
                      break;
-                 case "DELIVERED":
+                 case DELIVERED:
                      response.setDeliveredOrders(count.longValue());
                      break;
-                 case "CANCELLED":
+                 case CANCELLED:
                      response.setCancelledOrders(count.longValue());
                      break;
             }
@@ -74,22 +83,30 @@ public class AdminService {
             
             // 3. REVENUE CALCULATIONS
             BigDecimal totalRevenue = orderRepository.getTotalRevenue();
-            response.setTotalRevenue(totalRevenue);
+            response.setTotalRevenue(totalRevenue != null ? totalRevenue : BigDecimal.ZERO);
             
             // Average Order Value = Total Revenue / Total Orders
             if (response.getTotalOrders() > 0) {
-                BigDecimal avgValue = totalRevenue.divide(
-                    BigDecimal.valueOf(response.getTotalOrders()), 
-                    2, 
-                    BigDecimal.ROUND_HALF_UP
-                );
-                response.setAverageOrderValue(avgValue);
+            	try {
+                    BigDecimal avgValue = response.getTotalRevenue().divide(
+                        BigDecimal.valueOf(response.getTotalOrders()), 
+                        2, 
+                        BigDecimal.ROUND_HALF_UP
+                    );
+                    response.setAverageOrderValue(avgValue);
+                } catch (ArithmeticException e) {
+                    response.setAverageOrderValue(BigDecimal.ZERO);
+                }
+            } else {
+                response.setAverageOrderValue(BigDecimal.ZERO);
             }
             
             // 4. CONVERSION RATE
             if (response.getTotalCustomers() > 0) {
             	double conversion = (response.getTotalOrders() * 100.0) / response.getTotalCustomers();
             	response.setConversionRate(Math.min(conversion, 100.0));
+            } else {
+                response.setConversionRate(0.0);
             }
             
             // 5. MONTHLY REVENUE DATA
@@ -103,7 +120,22 @@ public class AdminService {
             
             // 8. RECENT CUSTOMERS
             response.setRecentCustomers(getRecentCustomers());
-        
+            
+			} catch (Exception e) {
+                // Log the error and return empty response with safe defaults
+                e.printStackTrace();
+                // Set all values to 0 to avoid null pointers
+                response.setTotalCustomers(0L);
+                response.setTotalProducts(0L);
+                response.setTotalOrders(0L);
+                response.setPendingOrders(0L);
+                response.setProcessingOrders(0L);
+                response.setDeliveredOrders(0L);
+                response.setCancelledOrders(0L);
+                response.setTotalRevenue(BigDecimal.ZERO);
+                response.setAverageOrderValue(BigDecimal.ZERO);
+                response.setConversionRate(0.0);
+            }
         return response;
     }
 	
