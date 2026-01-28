@@ -9,3 +9,5 @@ Thumbs.db
 .project 
 *.class 
 bin/ 
+"src/main/resources/application.properties" 
+"backend/src/main/resources/application.properties" 
