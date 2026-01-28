@@ -98,7 +98,7 @@
   font-size: 1.5rem;
   font-weight: 700;
   background: var(--gradient-primary);
-  -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
@@ -390,7 +390,7 @@
 
 .username-highlight {
   background: var(--gradient-primary);
-  -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
@@ -533,14 +533,16 @@
 
 /* Categories */
 .category-section {
-  padding: var(--space-lg);
-  background: var(--surface);
-  border-bottom: 1px solid var(--border);
+  
+  padding: 10px;
+  background: whitesmoke;
 }
 
 .categories-scroll {
   display: flex;
-  gap: var(--space-sm);
+  justify-content: left;
+  gap: 10px;
+  margin-left: 20px;
   overflow-x: auto;
   padding-bottom: var(--space-xs);
   -ms-overflow-style: none;

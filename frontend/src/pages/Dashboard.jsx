@@ -265,6 +265,16 @@ const Dashboard = () => {
                   <span className="nav-icon">👤</span>
                   <span className="nav-label">Profile</span>
                 </Link>
+
+                <Link to="/orders" className="nav-link" onClick={() => setSidebarOpen(false)}>
+                  <span className="nav-icon">📦</span>
+                  <span className="nav-label">Orders</span>
+                </Link>
+                
+                <button className="nav-link">
+                  <span className="nav-icon">❤️</span>
+                  <span className="nav-label">Wishlist</span>
+                </button>
                 
                 {userRole === 'ADMIN' && (
                   <Link 
@@ -314,15 +324,7 @@ const Dashboard = () => {
                   <span className="nav-label">{theme === 'light' ? 'Dark Mode' : 'Light Mode'}</span>
                 </button>
                 
-                <Link to="/orders" className="nav-link" onClick={() => setSidebarOpen(false)}>
-                  <span className="nav-icon">📦</span>
-                  <span className="nav-label">Orders</span>
-                </Link>
                 
-                <button className="nav-link">
-                  <span className="nav-icon">❤️</span>
-                  <span className="nav-label">Wishlist</span>
-                </button>
               </div>
             </div>
           </nav>
