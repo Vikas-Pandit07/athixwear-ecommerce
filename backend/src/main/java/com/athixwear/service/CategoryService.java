@@ -1,0 +1,67 @@
+package com.athixwear.service;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Service;
+
+import com.athixwear.dto.CategoryRequest;
+import com.athixwear.dto.CategoryResponse;
+import com.athixwear.entity.Category;
+import com.athixwear.repository.CategoryRepository;
+
+@Service
+public class CategoryService {
+	
+	private final CategoryRepository categoryRepository;
+
+	public CategoryService(CategoryRepository categoryRepository) {
+		super();
+		this.categoryRepository = categoryRepository;
+	}
+	
+	private CategoryResponse mapToResponse(Category category) {
+        CategoryResponse response = new CategoryResponse();
+        response.setCategoryId(category.getCategoryId());
+        response.setCategoryName(category.getCategoryName());
+        response.setDescription(category.getDescription());
+        return response;
+    }
+	
+	public CategoryResponse createCategory(CategoryRequest request) {
+		Optional<Category> existingCategory = categoryRepository.findByCategoryName(request.getCategoryName());
+		
+		if(existingCategory.isPresent()) {
+			throw new RuntimeException("Category with name '"+request.getCategoryName()+"' already exists");		
+			}
+		
+		Category category = new Category();
+		category.setCategoryName(request.getCategoryName());
+		category.setDescription(request.getDescription());
+		
+		Category savedCategory = categoryRepository.save(category);
+        return mapToResponse(savedCategory);
+	}
+	
+	// Get All Categories
+    public List<CategoryResponse> getAllCategories() {
+        return categoryRepository.findAll()
+                .stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
+    }
+
+    // Get Category by ID
+    public Optional<CategoryResponse> getCategoryById(int id) {
+        return categoryRepository.findById(id)
+                .map(this::mapToResponse);
+    }
+
+    // Get Category by Name
+    public Optional<CategoryResponse> getCategoryByName(String name) {
+        return categoryRepository.findByCategoryName(name)
+                .map(this::mapToResponse);
+    }
+	
+}
