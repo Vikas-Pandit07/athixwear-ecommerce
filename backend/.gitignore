@@ -1,3 +1,4 @@
+.metadata/
 HELP.md
 target/
 .mvn/wrapper/maven-wrapper.jar
@@ -31,3 +32,24 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# ============================================
+# SECRET FILES - NEVER COMMIT THESE!
+# ============================================
+
+# Environment variables
+.env
+.env.local
+*.env.local
+
+# Local configuration files
+application-local.properties
+application-dev.properties
+*.backup
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Application property backups
+application.properties.backup
