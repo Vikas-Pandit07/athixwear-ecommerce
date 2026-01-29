@@ -63,5 +63,35 @@ public class CategoryService {
         return categoryRepository.findByCategoryName(name)
                 .map(this::mapToResponse);
     }
+    
+    // update category
+    public CategoryResponse updateCategory(int id, CategoryRequest request) {
+    	Category category = categoryRepository.findById(id)
+    			.orElseThrow(() -> new RuntimeException("Category not found with id: "+id));
+    	
+    	// check if category name is being changed and if new name already exists
+    	if (!category.getCategoryName().equals(request.getCategoryName())) {
+    		Optional<Category> existingCategory = categoryRepository.findByCategoryName(request.getCategoryName());
+    		
+    		if (existingCategory.isPresent() && existingCategory.get().getCategoryId() != id) {
+    			throw new RuntimeException("Category with name '"+request.getCategoryName()+"' already exists");
+    		}
+    	}
+    	
+    	category.setCategoryName(request.getCategoryName());
+    	category.setDescription(request.getDescription());
+    	
+    	Category updateCategory = categoryRepository.save(category);
+    	return mapToResponse(updateCategory);
+    }
+    
+    public void deleteCategory(int id) {
+    	Category category = categoryRepository.findById(id)
+    			.orElseThrow(() -> new RuntimeException("Category with id: "+getCategoryById(id)+" not found"));
+    	
+    	categoryRepository.delete(category);
+    }
+    
+    
 	
 }
