@@ -257,7 +257,7 @@ const AdminDashboard = () => {
           className="tab-btn"
           onClick={() => navigate("/admin/categories")}
         >
-          📂 Categories
+          📂 Categories ({stats?.totalCategories || 0})
         </button>
       </div>
 
@@ -505,7 +505,7 @@ const AdminDashboard = () => {
 
           <button
             className="action-card"
-            onClick={() => navigate("/admin/categories/new")}
+            onClick={() => navigate("/admin/categories")}
           >
             <span className="action-icon">📂</span>
             <span className="action-text">Create Category</span>

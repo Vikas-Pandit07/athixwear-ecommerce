@@ -85,11 +85,30 @@ public class CategoryService {
     	return mapToResponse(updateCategory);
     }
     
+//    delete category
     public void deleteCategory(int id) {
     	Category category = categoryRepository.findById(id)
     			.orElseThrow(() -> new RuntimeException("Category with id: "+getCategoryById(id)+" not found"));
     	
     	categoryRepository.delete(category);
+    }
+    
+    // Search Categories by keyword
+    public List<CategoryResponse> searchCategories(String keyword) {
+        return categoryRepository.findAll()
+                .stream()
+                .filter(category -> 
+                    category.getCategoryName().toLowerCase().contains(keyword.toLowerCase()) ||
+                    (category.getDescription() != null && 
+                     category.getDescription().toLowerCase().contains(keyword.toLowerCase()))
+                )
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
+    }
+
+    // Get categories count
+    public long getCategoriesCount() {
+        return categoryRepository.count();
     }
     
     
