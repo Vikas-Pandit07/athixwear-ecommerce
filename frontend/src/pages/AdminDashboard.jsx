@@ -257,7 +257,7 @@ const AdminDashboard = () => {
           className="tab-btn"
           onClick={() => navigate("/admin/categories")}
         >
-          📂 Categories
+          📂 Categories ({stats?.totalCategories || 0})
         </button>
       </div>
 
