@@ -12,4 +12,56 @@ bin/
 src/main/resources/application.properties 
 backend/src/main/resources/application.properties 
 backend/src/main/resources/application-*.properties 
-backend/src/main/resources/application-*.properties 
+
+# Environment files
+.env
+.env.local
+.env.*.local
+.env.production
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# Build outputs
+*.jar
+*.war
+*.ear
+*.zip
+*.tar.gz
+
+# OS generated files
+.DS_Store?
+ehthumbs.db
+Icon?
+Thumbs.db
+
+# Temp files
+*.tmp
+*.temp
+*.swp
+*~
+~*
+
+# Spring Boot
+!src/main/resources/application-template.properties
+!backend/src/main/resources/application-template.properties
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# Dependency directories
+node_modules/
+jspm_packages/
+
+# Optional npm cache directory
+.npm
+
+# Optional REPL history
+.node_repl_history
