@@ -72,7 +72,7 @@ A modern, full-stack e-commerce application built with React and Spring Boot.
 
 - Git & GitHub
 - Postman (API Testing)
-- VS Code / IntelliJ IDEA
+- VS Code / IntelliJ IDEA / Ste(Spring Tool Suite
 - Maven (Dependency Management)
 
 ## 📁 Project Structure
@@ -202,25 +202,12 @@ Open a Pull Request
 📄 License
 This project is licensed under the MIT License - see LICENSE file for details.
 
-🙏 Acknowledgments
-React Documentation
-
-Spring Boot Documentation
-
-Unsplash for product images
-
-Shields.io for badges
-
 📞 Contact
 Vikas Pandit - @Vikas-Pandit07
+Email: vikaaspanditt369@gmail.com
 
-Project Link: https://github.com/Vikas-Pandit07/athixwear-ecommerce
+Project Link: comming soon
 
 ⭐️ Star this repository if you find it helpful!
 EOF
 
-### **6.3 Add and commit the README**
-
-git add README.md
-git commit -m "Add professional README file"
-git push
