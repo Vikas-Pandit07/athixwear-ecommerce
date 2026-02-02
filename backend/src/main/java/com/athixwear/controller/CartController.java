@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.athixwear.dto.AddToCartRequest;
 import com.athixwear.dto.CartItemResponse;
+import com.athixwear.dto.UpdateCartItemRequest;
 import com.athixwear.service.CartService;
 
 import jakarta.validation.Valid;
@@ -24,11 +25,11 @@ public class CartController {
     }
     
     // Add item to cart
-    @PostMapping("/add")
+    @PostMapping("/items")
     public ResponseEntity<?> addToCart(@Valid @RequestBody AddToCartRequest request) {
         try {
             cartService.addToCart(request);
-            return ResponseEntity.ok().body(Map.of(
+            return ResponseEntity.ok(Map.of(
                 "success", true,
                 "message", "Product added to cart successfully"
             ));
@@ -57,17 +58,14 @@ public class CartController {
             
             BigDecimal total = subtotal.add(shipping);
             
-            // Create response map
-            Map<String, Object> response = Map.of(
-                "success", true,
-                "items", items,
-                "subtotal", subtotal,
-                "shipping", shipping,
-                "total", total,
-                "itemCount", items.size()
-            );
-            
-            return ResponseEntity.ok(response);
+            return ResponseEntity.ok(Map.of(
+                    "success", true,
+                    "items", items,
+                    "subtotal", subtotal,
+                    "shipping", shipping,
+                    "total", total,
+                    "itemCount", items.size()
+            ));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(Map.of(
                 "success", false,
@@ -80,10 +78,10 @@ public class CartController {
     @PutMapping("/items/{itemId}")
     public ResponseEntity<?> updateQuantity(
             @PathVariable Integer itemId,
-            @RequestParam Integer quantity) {
+            @Valid @RequestBody UpdateCartItemRequest request) {
         try {
-            cartService.updateQuantity(itemId, quantity);
-            return ResponseEntity.ok().body(Map.of(
+            cartService.updateQuantity(itemId, request.getQuantity());
+            return ResponseEntity.ok(Map.of(
                 "success", true,
                 "message", "Cart updated successfully"
             ));
@@ -100,7 +98,7 @@ public class CartController {
     public ResponseEntity<?> removeItemFromCart(@PathVariable Integer itemId) {
         try {
             cartService.removeCartItem(itemId);
-            return ResponseEntity.ok().body(Map.of(
+            return ResponseEntity.ok(Map.of(
                 "success", true,
                 "message", "Item removed from cart"
             ));
@@ -117,24 +115,24 @@ public class CartController {
     public ResponseEntity<?> getCartItemCount() {
         try {
             int count = cartService.getCartItemCount();
-            return ResponseEntity.ok().body(Map.of(
+            return ResponseEntity.ok(Map.of(
                 "success", true,
                 "count", count
             ));
         } catch (Exception e) {
-            return ResponseEntity.ok().body(Map.of(
+            return ResponseEntity.badRequest().body(Map.of(
                 "success", false,
                 "count", 0
             ));
         }
     }
     
-    // Clear full cart
-    @DeleteMapping("/clear")
+    // Clear cart
+    @DeleteMapping()
     public ResponseEntity<?> clearCart() {
         try {
             cartService.clearCart();
-            return ResponseEntity.ok().body(Map.of(
+            return ResponseEntity.ok(Map.of(
                 "success", true,
                 "message", "Cart cleared successfully"
             ));

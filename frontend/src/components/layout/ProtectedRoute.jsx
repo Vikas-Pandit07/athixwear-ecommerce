@@ -6,36 +6,39 @@ const ProtectedRoute = ({ children, requireAdmin = false }) => {
   const [loading, setLoading] = useState(true);
   const [authStatus, setAuthStatus] = useState({
     authenticated: false,
-    isAdmin: false
+    isAdmin: false,
   });
   const location = useLocation();
 
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const response = await fetch("http://localhost:9090/api/user/check-role", {
-          method: "GET",
-          credentials: "include",
-        });
+        const response = await fetch(
+          "http://localhost:9090/api/user/check-role",
+          {
+            method: "GET",
+            credentials: "include",
+          },
+        );
 
         const data = await response.json();
-        
+
         if (response.ok && data.authenticated) {
           setAuthStatus({
             authenticated: true,
-            isAdmin: data.isAdmin || false
+            isAdmin: data.isAdmin || false,
           });
         } else {
           setAuthStatus({
             authenticated: false,
-            isAdmin: false
+            isAdmin: false,
           });
         }
       } catch (error) {
         console.error("Auth check failed:", error);
         setAuthStatus({
           authenticated: false,
-          isAdmin: false
+          isAdmin: false,
         });
       } finally {
         setLoading(false);

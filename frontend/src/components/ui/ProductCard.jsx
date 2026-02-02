@@ -20,7 +20,7 @@ const ProductCard = ({
   isNew,
   isFeatured,
   isOnSale,
-  onAddToCart
+  onAddToCart,
 }) => {
   const [adding, setAdding] = useState(false);
   const [inWishlist, setInWishlist] = useState(false);
@@ -35,24 +35,26 @@ const ProductCard = ({
   useEffect(() => {
     const checkIfInCart = async () => {
       try {
-        const response = await fetch('http://localhost:9090/api/cart', {
-          method: 'GET',
-          credentials: 'include'
+        const response = await fetch("http://localhost:9090/api/cart", {
+          method: "GET",
+          credentials: "include",
         });
-        
+
         if (response.ok) {
           const data = await response.json();
           if (data.success && data.items) {
-            const productInCart = data.items.find(item => item.productId === productId);
+            const productInCart = data.items.find(
+              (item) => item.productId === productId,
+            );
             setIsInCart(!!productInCart);
             setShowViewCart(!!productInCart);
           }
         }
       } catch (err) {
-        console.error('Error checking cart:', err);
+        console.error("Error checking cart:", err);
       }
     };
-    
+
     checkIfInCart();
   }, [productId]);
 
@@ -73,11 +75,11 @@ const ProductCard = ({
     setShowViewCart(false);
 
     try {
-      const response = await fetch("http://localhost:9090/api/cart/add", {
+      const response = await fetch("http://localhost:9090/api/cart/items", {
         method: "POST",
-        headers: { 
+        headers: {
           "Content-Type": "application/json",
-          "Accept": "application/json"
+          Accept: "application/json",
         },
         credentials: "include",
         body: JSON.stringify({
@@ -92,15 +94,15 @@ const ProductCard = ({
         setMessage({ type: "success", text: `${name} added to cart!` });
         setIsInCart(true);
         setShowViewCart(true);
-        
+
         // Call the callback to update cart count in parent
         if (onAddToCart) {
           onAddToCart();
         }
-        
+
         // Trigger a global event for other components
-        window.dispatchEvent(new CustomEvent('cartUpdated'));
-        
+        window.dispatchEvent(new CustomEvent("cartUpdated"));
+
         setTimeout(() => {
           setMessage({ type: "", text: "" });
         }, 3000);
@@ -126,7 +128,7 @@ const ProductCard = ({
 
   const handleViewCart = (e) => {
     e.stopPropagation();
-    navigate('/cart');
+    navigate("/cart");
   };
 
   const handleWishlistToggle = (e) => {
@@ -136,8 +138,14 @@ const ProductCard = ({
 
   const calculateDiscount = () => {
     if (originalPrice && price) {
-      const orig = typeof originalPrice === 'string' ? parseFloat(originalPrice.replace('₹', '').replace(/,/g, '')) : originalPrice;
-      const curr = typeof price === 'string' ? parseFloat(price.replace('₹', '').replace(/,/g, '')) : price;
+      const orig =
+        typeof originalPrice === "string"
+          ? parseFloat(originalPrice.replace("₹", "").replace(/,/g, ""))
+          : originalPrice;
+      const curr =
+        typeof price === "string"
+          ? parseFloat(price.replace("₹", "").replace(/,/g, ""))
+          : price;
       if (orig > curr) {
         return Math.round(((orig - curr) / orig) * 100);
       }
