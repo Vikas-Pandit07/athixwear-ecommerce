@@ -4,7 +4,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
-public class AddressRequest {
+public class AddAddressRequest {
     
     @NotBlank(message = "Full name is required")
     private String fullName;

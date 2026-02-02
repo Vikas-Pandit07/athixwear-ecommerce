@@ -2,8 +2,14 @@ package com.athixwear.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import com.athixwear.dto.AddAddressRequest;
+import com.athixwear.dto.UpdateAddressRequest;
 import com.athixwear.entity.Address;
 import com.athixwear.service.AddressService;
+
+import jakarta.validation.Valid;
+
 import java.util.List;
 import java.util.Map;
 
@@ -35,7 +41,7 @@ public class AddressController {
     }
     
     @PostMapping
-    public ResponseEntity<?> addAddress(@RequestBody Map<String, Object> request) {
+    public ResponseEntity<?> addAddress(@Valid @RequestBody AddAddressRequest request) {
         try {
             Address address = addressService.addAddress(request);
             return ResponseEntity.ok().body(Map.of(
@@ -54,7 +60,7 @@ public class AddressController {
     @PutMapping("/{addressId}")
     public ResponseEntity<?> updateAddress(
             @PathVariable Integer addressId,
-            @RequestBody Map<String, Object> request) {
+            @RequestBody UpdateAddressRequest request) {
         try {
             Address address = addressService.updateAddress(addressId, request);
             return ResponseEntity.ok().body(Map.of(
