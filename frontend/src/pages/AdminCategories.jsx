@@ -119,13 +119,17 @@ const AdminCategories = () => {
           editingCategory
             ? "Category updated successfully!"
             : "Category created successfully!",
-          "success"
+          "success",
         );
       } else {
-        setError(data.error || `Failed to ${editingCategory ? "update" : "create"} category`);
+        setError(
+          data.error ||
+            `Failed to ${editingCategory ? "update" : "create"} category`,
+        );
         showToast(
-          data.error || `Failed to ${editingCategory ? "update" : "create"} category`,
-          "error"
+          data.error ||
+            `Failed to ${editingCategory ? "update" : "create"} category`,
+          "error",
         );
       }
     } catch (err) {
@@ -148,16 +152,23 @@ const AdminCategories = () => {
   };
 
   const handleDelete = async (categoryId) => {
-    if (!window.confirm("Are you sure you want to delete this category? This action cannot be undone.")) {
+    if (
+      !window.confirm(
+        "Are you sure you want to delete this category? This action cannot be undone.",
+      )
+    ) {
       return;
     }
 
     try {
       setActionLoading(true);
-      const response = await fetch(`http://localhost:9090/api/categories/${categoryId}`, {
-        method: "DELETE",
-        credentials: "include",
-      });
+      const response = await fetch(
+        `http://localhost:9090/api/categories/${categoryId}`,
+        {
+          method: "DELETE",
+          credentials: "include",
+        },
+      );
 
       const data = await response.json();
 
@@ -197,7 +208,7 @@ const AdminCategories = () => {
         {
           method: "GET",
           credentials: "include",
-        }
+        },
       );
 
       const data = await response.json();
@@ -228,20 +239,21 @@ const AdminCategories = () => {
       <span>${message}</span>
       <button class="toast-close">×</button>
     `;
-    
+
     // Add to container
-    const container = document.querySelector('.toast-container') || createToastContainer();
+    const container =
+      document.querySelector(".toast-container") || createToastContainer();
     container.appendChild(toast);
-    
+
     // Auto remove after 5 seconds
     setTimeout(() => {
-      toast.classList.add('fade-out');
+      toast.classList.add("fade-out");
       setTimeout(() => toast.remove(), 300);
     }, 5000);
-    
+
     // Close button
-    toast.querySelector('.toast-close').addEventListener('click', () => {
-      toast.classList.add('fade-out');
+    toast.querySelector(".toast-close").addEventListener("click", () => {
+      toast.classList.add("fade-out");
       setTimeout(() => toast.remove(), 300);
     });
   };
@@ -257,7 +269,7 @@ const AdminCategories = () => {
     (category) =>
       category.categoryName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (category.description &&
-        category.description.toLowerCase().includes(searchTerm.toLowerCase()))
+        category.description.toLowerCase().includes(searchTerm.toLowerCase())),
   );
 
   if (loading && !actionLoading) {
@@ -323,6 +335,17 @@ const AdminCategories = () => {
           <div className="stat-content">
             <h3>Total Categories</h3>
             <p className="stat-value">{categories.length}</p>
+            <p className="stat-trend">All time</p>
+          </div>
+        </div>
+         <div className="stat-card">
+          <div className="stat-icon">
+            <span>✅</span>
+          </div>
+          <div className="stat-content">
+            <h3>Active Categories</h3>
+            <p className="stat-value">{categories.length}</p>
+            <p className="stat-trend">In use</p>
           </div>
         </div>
         <div className="stat-card">
@@ -438,7 +461,9 @@ const AdminCategories = () => {
                   disabled={actionLoading}
                 />
                 {formErrors.categoryName && (
-                  <span className="error-message">{formErrors.categoryName}</span>
+                  <span className="error-message">
+                    {formErrors.categoryName}
+                  </span>
                 )}
               </div>
 
@@ -456,7 +481,9 @@ const AdminCategories = () => {
                   disabled={actionLoading}
                 />
                 {formErrors.description && (
-                  <span className="error-message">{formErrors.description}</span>
+                  <span className="error-message">
+                    {formErrors.description}
+                  </span>
                 )}
                 <div className="char-count">
                   {formData.description.length}/500 characters
