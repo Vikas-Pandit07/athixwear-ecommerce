@@ -675,24 +675,24 @@
   .admin-categories {
     padding: var(--space-md);
   }
-  
+
   .categories-header h1 {
     font-size: 2rem;
   }
-  
+
   .actions-bar {
     flex-direction: column;
     align-items: stretch;
   }
-  
+
   .search-container {
     max-width: none;
   }
-  
+
   .stats-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .categories-table-container {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
@@ -703,29 +703,29 @@
   .categories-header h1 {
     font-size: 1.5rem;
   }
-  
+
   .modal-content {
     margin: var(--space-md);
   }
-  
+
   .modal-header,
   .category-form {
     padding: var(--space-lg);
   }
-  
+
   .form-actions {
     flex-direction: column-reverse;
   }
-  
+
   .form-actions button {
     width: 100%;
   }
-  
+
   .toast-container {
     right: var(--space-md);
     left: var(--space-md);
   }
-  
+
   .toast {
     min-width: auto;
     width: 100%;
