@@ -126,4 +126,21 @@ public class CategoryController {
             return ResponseEntity.internalServerError().body(error);
         }
     }
+    
+    @GetMapping("/search")
+    public ResponseEntity<?> searchCategories(@RequestParam String keyword) {
+        try {
+            List<CategoryResponse> categories = categoryService.searchCategories(keyword);
+            Map<String, Object> result = new HashMap<>();
+            result.put("success", true);
+            result.put("data", categories);
+            result.put("count", categories.size());
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            Map<String, Object> error = new HashMap<>();
+            error.put("success", false);
+            error.put("error", "Search failed");
+            return ResponseEntity.internalServerError().body(error);
+        }
+    }
 }

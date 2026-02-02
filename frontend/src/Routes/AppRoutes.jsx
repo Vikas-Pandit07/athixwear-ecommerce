@@ -14,6 +14,7 @@ import CheckoutPage from "../pages/CheckoutPage";
 import OrderConfirmation from "./../pages/OrderConfirmation";
 import ProductDetails from "../pages/ProductDetailsPage";
 import ProductDetailsPage from "../pages/ProductDetailsPage";
+import AdminCategories from "../pages/AdminCategories";
 
 const AppRoutes = () => (
   <Routes>
@@ -86,6 +87,15 @@ const AppRoutes = () => (
         </ProtectedRoute>
       }
     /> 
+
+    <Route
+      path="/admin/categories"
+      element={
+        <ProtectedRoute>
+          <AdminCategories/>
+        </ProtectedRoute>
+      }
+      />
   </Routes>
 );
 
