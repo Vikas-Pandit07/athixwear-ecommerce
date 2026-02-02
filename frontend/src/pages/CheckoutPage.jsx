@@ -181,11 +181,7 @@ const CheckoutPage = () => {
       return;
     }
 
-    if (
-      !orderSummary ||
-      !orderSummary.items ||
-      orderSummary.items.length === 0
-    ) {
+    if (!orderSummary?.items || orderSummary.items.length === 0) {
       setMessage({ type: "error", text: "Your cart is empty" });
       return;
     }
@@ -210,29 +206,14 @@ const CheckoutPage = () => {
 
       const data = await response.json();
 
-      if (response.ok && data.success) {
+      if (response.ok && data.orderId) {
         setMessage({
           type: "success",
           text: data.message || "Order placed successfully!",
         });
 
-        // Wait 1 second then navigate to confirmation
         setTimeout(() => {
-          // Check if we have orderId in response
-          if (data.orderId) {
-            navigate(`/order-confirmation/${data.orderId}`);
-          } else {
-            // Try to get orderId from order object
-            if (data.order && data.order.orderId) {
-              navigate(`/order-confirmation/${data.order.orderId}`);
-            } else {
-              setMessage({ 
-                type: "error", 
-                text: "Order placed but couldn't get order ID. Please check your orders." 
-              });
-              setTimeout(() => navigate('/profile?tab=orders'), 3000);
-            }
-          }
+          navigate(`/order-confirmation/${data.orderId}`);
         }, 1000);
       } else {
         setMessage({

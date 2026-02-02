@@ -1,8 +1,12 @@
 package com.athixwear.controller;
 
 import com.athixwear.dto.CheckoutRequest;
+import com.athixwear.dto.CheckoutResponse;
 import com.athixwear.dto.OrderResponse;
 import com.athixwear.service.OrderService;
+
+import jakarta.validation.Valid;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,21 +24,11 @@ public class OrderController {
     }
     
     @PostMapping("/checkout")
-    public ResponseEntity<?> checkout(@RequestBody CheckoutRequest request) {
-        try {
-            OrderResponse order = orderService.createOrder(request);
-            return ResponseEntity.ok().body(Map.of(
-                "success", true,
-                "message", "Order placed successfully",
-                "orderId", order.getOrderId(),
-                "order", order
-            ));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(Map.of(
-                "success", false,
-                "error", e.getMessage()
-            ));
-        }
+    public ResponseEntity<?> checkout(@Valid @RequestBody CheckoutRequest request) {
+    	
+    	CheckoutResponse response = orderService.createOrder(request);
+    	
+    	return ResponseEntity.ok(response);
     }
     
     @GetMapping

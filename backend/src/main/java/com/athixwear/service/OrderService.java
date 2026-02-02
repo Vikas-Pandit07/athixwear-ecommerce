@@ -2,6 +2,7 @@ package com.athixwear.service;
 
 import com.athixwear.dto.AddressResponse;
 import com.athixwear.dto.CheckoutRequest;
+import com.athixwear.dto.CheckoutResponse;
 import com.athixwear.dto.OrderItemResponse;
 import com.athixwear.dto.OrderResponse;
 import com.athixwear.entity.*;
@@ -43,7 +44,7 @@ public class OrderService {
 	}
     
     @Transactional
-    public OrderResponse createOrder(CheckoutRequest request) {
+    public CheckoutResponse createOrder(CheckoutRequest request) {
         User user = userService.getCurrentUser();
         
         // Get user's cart items
@@ -76,12 +77,20 @@ public class OrderService {
         order.setAddress(address);
         order.setOrderStatus(OrderStatus.PENDING);
         order.setPaymentStatus(PaymentStatus.PENDING);
+        order.setPaymentMethod(request.getPaymentMethod());
         order.setOrderDate(LocalDateTime.now());
         
         Order savedOrder = orderRepository.save(order);
         
         // Create order items and update product stock
         for (CartItem cartItem : cartItems) {
+        	
+        	if (cartItem.getQuantity() > cartItem.getProduct().getStock()) {
+                throw new RuntimeException(
+                        "Insufficient stock for " + cartItem.getProduct().getName()
+                );
+            }
+        	
             OrderItem orderItem = new OrderItem();
             orderItem.setOrder(savedOrder);
             orderItem.setProduct(cartItem.getProduct());
@@ -96,11 +105,6 @@ public class OrderService {
             // Update product stock
             Product product = cartItem.getProduct();
             int newStock = product.getStock() - cartItem.getQuantity();
-            
-            if (newStock < 0) {
-                throw new RuntimeException("Insufficient stock for product: " + product.getName());
-            }
-            
             product.setStock(newStock);
             productRepository.save(product);
         }
@@ -108,7 +112,14 @@ public class OrderService {
         // Clear cart after order
         cartService.clearCart();
         
-        return getOrderResponse(savedOrder);
+        CheckoutResponse response = new CheckoutResponse();
+        response.setOrderId(savedOrder.getOrderId());
+        response.setOrderStatus(savedOrder.getOrderStatus().name());
+        response.setPaymentStatus(savedOrder.getPaymentStatus().name());
+        response.setTotalAmount(savedOrder.getTotalAmount());
+        response.setMessage("Order placed successfully");
+
+        return response;
     }
     
     public List<OrderResponse> getUserOrders() {
