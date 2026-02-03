@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import "../../assets/css/auth.css"
+import "../../assets/css/auth.css";
+import { registerUser } from "../../services/authService";
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -11,6 +12,7 @@ const Register = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
+
   const navigate = useNavigate();
 
   const validateForm = () => {
@@ -55,23 +57,10 @@ const Register = () => {
     setLoading(true);
 
     try {
-      const response = await fetch("http://localhost:9090/api/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        setTimeout(() => {
-          navigate("/login");
-        }, 1500);
-      } else {
-        setErrors({ server: data.error || "Registration failed" });
-      }
+      await registerUser(formData);
+      navigate("/login");
     } catch (err) {
-      setErrors({ server: "Server connection error" });
+      setErrors({ server: err.message || "Registration failed" });
     } finally {
       setLoading(false);
     }

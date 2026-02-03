@@ -1,12 +1,14 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "../../assets/css/auth.css";
+import { loginUser } from "../../services/authService";
 
 const Login = () => {
   const [usernameOrEmail, setUsernameOrEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -15,22 +17,11 @@ const Login = () => {
     setLoading(true);
 
     try {
-      const response = await fetch("http://localhost:9090/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ usernameOrEmail, password }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
+       await loginUser({ usernameOrEmail, password}); 
+        
         navigate("/dashboard", { replace: true });
-      } else {
-        setError(data.error || "Login failed. Please check your credentials.");
-      }
     } catch (err) {
-      setError("Server not reachable. Please try again later.");
+       setError(err.message || "Login failed");
     } finally {
       setLoading(false);
     }
@@ -57,10 +48,12 @@ const Login = () => {
               <div className="fashion-spinner"></div>
             </div>
           )}
+
           <div className="brand-identity">
             <h2>Welcome Back</h2>
             <p className="brand-subtitle">Sign in to continue your journey</p>
           </div>
+          
           <form onSubmit={handleSubmit} className="fashion-form">
             {error && (
               <div className="error-toast">
