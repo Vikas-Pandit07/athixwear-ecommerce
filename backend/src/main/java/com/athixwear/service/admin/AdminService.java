@@ -17,21 +17,18 @@ import com.athixwear.repository.UserRepository;
 @Service
 public class AdminService {
 
-    private final AddressController addressController;
-	
 	private final OrderRepository orderRepository;
 	private final UserRepository userRepository;
 	private final ProductRepository productRepository;
 	private final OrderItemRepository orderItemRepository;
 	
 	public AdminService(OrderRepository orderRepository, UserRepository userRepository,
-			ProductRepository productRepository, OrderItemRepository orderItemRepository, AddressController addressController) {
+			ProductRepository productRepository, OrderItemRepository orderItemRepository) {
 		super();
 		this.orderRepository = orderRepository;
 		this.userRepository = userRepository;
 		this.productRepository = productRepository;
 		this.orderItemRepository = orderItemRepository;
-		this.addressController = addressController;
 	}
 	
 	public AdminStatsResponse getDashboardStats() {
