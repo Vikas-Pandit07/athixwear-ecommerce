@@ -27,51 +27,29 @@ public class CartController {
     // Add item to cart
     @PostMapping("/items")
     public ResponseEntity<?> addToCart(@Valid @RequestBody AddToCartRequest request) {
-        try {
-            cartService.addToCart(request);
-            return ResponseEntity.ok(Map.of(
-                "success", true,
-                "message", "Product added to cart successfully"
-            ));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(Map.of(
-                "success", false,
-                "error", e.getMessage()
-            ));
-        }
+    	   cartService.addToCart(request);
+           return ResponseEntity.ok(Map.of("success", true));
     }
     
     // Get all cart items
     @GetMapping
     public ResponseEntity<?> getCart() {
-        try {
-            List<CartItemResponse> items = cartService.getCartItems();
-            
-            // Calculate totals
-            BigDecimal subtotal = items.stream()
-                    .map(item -> item.getTotalPrice())
-                    .reduce(BigDecimal.ZERO, BigDecimal::add);
-            
-            BigDecimal shipping = subtotal.compareTo(BigDecimal.valueOf(1000)) > 0 
-                    ? BigDecimal.ZERO 
-                    : BigDecimal.valueOf(50);
-            
-            BigDecimal total = subtotal.add(shipping);
-            
-            return ResponseEntity.ok(Map.of(
-                    "success", true,
-                    "items", items,
-                    "subtotal", subtotal,
-                    "shipping", shipping,
-                    "total", total,
-                    "itemCount", items.size()
-            ));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(Map.of(
-                "success", false,
-                "error", e.getMessage()
-            ));
-        }
+    	 List<CartItemResponse> items = cartService.getCartItems();
+
+         BigDecimal subtotal = items.stream()
+                 .map(CartItemResponse::getTotalPrice)
+                 .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+         BigDecimal shipping = subtotal.compareTo(BigDecimal.valueOf(1000)) > 0
+                 ? BigDecimal.ZERO : BigDecimal.valueOf(50);
+
+         return ResponseEntity.ok(Map.of(
+                 "success", true,
+                 "items", items,
+                 "subtotal", subtotal,
+                 "shipping", shipping,
+                 "total", subtotal.add(shipping)
+         ));
     }
     
     // Update item quantity
@@ -79,68 +57,32 @@ public class CartController {
     public ResponseEntity<?> updateQuantity(
             @PathVariable Integer itemId,
             @Valid @RequestBody UpdateCartItemRequest request) {
-        try {
-            cartService.updateQuantity(itemId, request.getQuantity());
-            return ResponseEntity.ok(Map.of(
-                "success", true,
-                "message", "Cart updated successfully"
-            ));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(Map.of(
-                "success", false,
-                "error", e.getMessage()
-            ));
-        }
+    	cartService.updateQuantity(itemId, request.getQuantity());
+        return ResponseEntity.ok(Map.of("success", true));
     }
     
     // Remove item from cart
     @DeleteMapping("/items/{itemId}")
     public ResponseEntity<?> removeItemFromCart(@PathVariable Integer itemId) {
-        try {
-            cartService.removeCartItem(itemId);
-            return ResponseEntity.ok(Map.of(
-                "success", true,
-                "message", "Item removed from cart"
-            ));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(Map.of(
-                "success", false,
-                "error", e.getMessage()
-            ));
-        }
+    	 cartService.removeCartItem(itemId);
+         return ResponseEntity.ok(Map.of("success", true));
     }
     
     // Get cart item count for badge
     @GetMapping("/count")
     public ResponseEntity<?> getCartItemCount() {
-        try {
+        
             int count = cartService.getCartItemCount();
             return ResponseEntity.ok(Map.of(
                 "success", true,
                 "count", count
             ));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(Map.of(
-                "success", false,
-                "count", 0
-            ));
-        }
     }
     
     // Clear cart
     @DeleteMapping()
     public ResponseEntity<?> clearCart() {
-        try {
-            cartService.clearCart();
-            return ResponseEntity.ok(Map.of(
-                "success", true,
-                "message", "Cart cleared successfully"
-            ));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(Map.of(
-                "success", false,
-                "error", e.getMessage()
-            ));
-        }
+    	 cartService.clearCart();
+         return ResponseEntity.ok(Map.of("success", true));
     }
 }

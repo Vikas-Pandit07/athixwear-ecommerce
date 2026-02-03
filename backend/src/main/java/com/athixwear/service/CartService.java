@@ -13,6 +13,7 @@ import com.athixwear.entity.CartItem;
 import com.athixwear.entity.Product;
 import com.athixwear.entity.ProductImage;
 import com.athixwear.entity.User;
+import com.athixwear.exception.InvalidCredentialsException;
 import com.athixwear.exception.ResourceNotFoundException;
 import com.athixwear.repository.CartItemRepository;
 import com.athixwear.repository.CartRepository;
@@ -63,11 +64,6 @@ public class CartService {
         Product product = productRepository.findById(request.getProductId())
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
         
-        // check stock availability
-        if (product.getStock() <= 0) {
-        	throw new RuntimeException("Product '" + product.getName() + "' is out of stock");
-        }
-        
         // check if requested quantity available in stock
         Optional<CartItem> existingItem = cartItemRepository.findByCartAndProduct(cart, product);
         int currentQuantity = existingItem.map(CartItem::getQuantity).orElse(0);
@@ -108,29 +104,31 @@ public class CartService {
     // update item quantity with stock validation
     @Transactional
     public void updateQuantity(Integer cartItemId, Integer quantity) {
+
         CartItem item = cartItemRepository.findById(cartItemId)
-                .orElseThrow(() -> new ResourceNotFoundException("Cart item not found"));
-        
-        // check if item belongs to current user;
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Cart item not found"));
+
         User user = getCurrentUser();
+
         if (!item.getCart().getUser().getUserId().equals(user.getUserId())) {
-                throw new RuntimeException("Not authorized to update this cart item");
+            throw new InvalidCredentialsException("Not authorized to modify this cart");
         }
-        
-        // check stock availability  
-        if (quantity > item.getProduct().getStock()) {
-        	throw new RuntimeException("Requested quantity exceeds available stock. Available: " + item.getProduct().getStock());        	
-        }
-        
+
         if (quantity <= 0) {
-        	// remove item if quantity is 0 or negative
             cartItemRepository.delete(item);
-        } else {
-            // update quantity
-            item.setQuantity(quantity);
-            cartItemRepository.save(item);
+            return;
         }
+
+        if (quantity > item.getProduct().getStock()) {
+            throw new InvalidCredentialsException(
+                    "Requested quantity exceeds available stock");
+        }
+
+        item.setQuantity(quantity);
+        cartItemRepository.save(item);
     }
+
     
     // remove item from cart
     @Transactional

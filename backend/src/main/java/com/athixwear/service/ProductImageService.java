@@ -8,6 +8,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.athixwear.entity.Product;
 import com.athixwear.entity.ProductImage;
+import com.athixwear.exception.ResourceNotFoundException;
 import com.athixwear.repository.ProductImageRepository;
 import com.athixwear.repository.ProductRepository;
 
@@ -34,7 +35,7 @@ public class ProductImageService {
 			List<MultipartFile> files) {
 		
 		Product product = productRepository.findById(productId)
-				.orElseThrow(() -> new RuntimeException("Product not found"));
+				.orElseThrow(() -> new ResourceNotFoundException("Product not found"));
 				
 		for (int i = 0; i < files.size(); i++) {
 			String url = uploadService.uploadProductImage(files.get(i));
@@ -42,7 +43,7 @@ public class ProductImageService {
 			ProductImage image = new ProductImage();
 			image.setProduct(product);
 			image.setImageUrl(url);
-			image.setPrimaryImage(true); // first img = primary
+			image.setPrimaryImage(i == 0); // first img = primary
 			
 			imageRepository.save(image);
 		}

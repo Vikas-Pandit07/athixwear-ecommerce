@@ -26,22 +26,21 @@ public class AuthService {
 
     public LoginResponse login(LoginRequest request) {
 
-    	User user = userRepository.findByUsernameOrEmail(
-                request.getUsernameOrEmail(), 
+        User user = userRepository.findByUsernameOrEmail(
+                request.getUsernameOrEmail(),
                 request.getUsernameOrEmail()
-            )
-             .orElseThrow(() -> new InvalidCredentialsException("Invalid credentials"));
+        ).orElseThrow(() ->
+                new InvalidCredentialsException("Invalid username or password"));
 
         if (!encoder.matches(request.getPassword(), user.getPassword())) {
-            throw new InvalidCredentialsException("Invalid credentials");
+            throw new InvalidCredentialsException("Invalid username or password");
         }
-        
+
         if (!user.isActive()) {
             throw new InvalidCredentialsException("Account is deactivated");
         }
 
         String token = jwtService.generateToken(user.getUsername());
-
         return new LoginResponse(user.getUsername(), user.getEmail(), token);
     }
 }

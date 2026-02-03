@@ -3,9 +3,7 @@ package com.athixwear.service.admin;
 import java.math.BigDecimal;
 import java.util.List;
 
-import org.eclipse.angus.mail.handlers.message_rfc822;
 import org.springframework.stereotype.Service;
-import com.athixwear.controller.AddressController;
 import com.athixwear.dto.admin.AdminStatsResponse;
 import com.athixwear.entity.OrderStatus;
 import com.athixwear.entity.Role;

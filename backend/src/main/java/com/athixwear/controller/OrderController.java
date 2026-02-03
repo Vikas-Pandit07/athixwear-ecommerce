@@ -33,32 +33,19 @@ public class OrderController {
     
     @GetMapping
     public ResponseEntity<?> getUserOrders() {
-        try {
+        
             return ResponseEntity.ok().body(Map.of(
                 "success", true,
                 "orders", orderService.getUserOrders()
             ));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(Map.of(
-                "success", false,
-                "error", e.getMessage()
-            ));
-        }
     }
     
     @GetMapping("/{orderId}")
     public ResponseEntity<?> getOrderById(@PathVariable Integer orderId) {
-        try {
             OrderResponse order = orderService.getOrderById(orderId);
             return ResponseEntity.ok().body(Map.of(
                 "success", true,
                 "order", order
             ));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(Map.of(
-                "success", false,
-                "error", e.getMessage()
-            ));
-        }
     }
 }
