@@ -44,7 +44,7 @@ export const forgotPassword = async (email) => {
 
 // Reset Password
 export const resetPassword = async (resetData) => {
-  // resetData = {newToken, newPassword, confirmPassword}
+  // resetData = {Token, newPassword, confirmPassword}
 
   return await apiRequest("/api/auth/reset-password", {
     method: "POST",
