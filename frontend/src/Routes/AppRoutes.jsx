@@ -12,7 +12,6 @@ import AdminDashboard from "../pages/AdminDashboard";
 import ProtectedRoute from "./ProtectedRoute";
 import CheckoutPage from "../pages/CheckoutPage";
 import OrderConfirmation from "../pages/OrderConfirmation";
-import ProductDetails from "../pages/ProductDetailsPage";
 import ProductDetailsPage from "../pages/ProductDetailsPage";
 import AdminCategories from "../pages/AdminCategories";
 const AppRoutes = () => (
