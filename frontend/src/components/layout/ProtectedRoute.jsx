@@ -1,80 +1,53 @@
 import React, { useEffect, useState } from "react";
 import { Navigate, useLocation } from "react-router-dom";
+import { checkAuth } from "../../services/authService";
 
 const ProtectedRoute = ({ children, requireAdmin = false }) => {
   const [loading, setLoading] = useState(true);
-  const [authStatus, setAuthStatus] = useState({
+  const [auth, setAuth] = useState({
     authenticated: false,
-    isAdmin: false,
+    role: null,
   });
+
   const location = useLocation();
 
   useEffect(() => {
-    const checkAuth = async () => {
+    const verifyUser = async () => {
       try {
-        const response = await fetch(
-          "http://localhost:9090/api/user/check-role",
-          {
-            method: "GET",
-            credentials: "include",
-          },
-        );
+        const data = await checkAuth();
 
-        const data = await response.json();
-
-        if (response.ok && data.authenticated) {
-          setAuthStatus({
-            authenticated: true,
-            isAdmin: data.isAdmin || false,
-          });
-        } else {
-          setAuthStatus({
-            authenticated: false,
-            isAdmin: false,
-          });
-        }
+        setAuth({
+          authenticated: true,
+          role: data.role,
+        });
       } catch (error) {
-        console.error("Auth check failed:", error);
-        setAuthStatus({
+        setAuth({
           authenticated: false,
-          isAdmin: false,
+          role: null,
         });
       } finally {
         setLoading(false);
       }
     };
 
-    checkAuth();
+    verifyUser();
   }, []);
 
   if (loading) {
     return (
       <div className="auth-loading-screen">
-        <div className="loading-animation">
-          <div className="fashion-spinner large"></div>
-          <div className="loading-text">
-            <h3>ATHIX WEAR</h3>
-            <p>Checking authentication...</p>
-          </div>
-        </div>
+        <div className="fashion-spinner large"></div>
+        <p>Checking authentication...</p>
       </div>
     );
   }
 
-  if (!authStatus.authenticated) {
+  if (!auth.authenticated) {
     return <Navigate to="/login" replace state={{ from: location }} />;
   }
 
-  if (requireAdmin && !authStatus.isAdmin) {
-    return (
-      <div className="unauthorized-page">
-        <div className="unauthorized-content">
-          <h2>🔒 Access Restricted</h2>
-          <p>Administrator privileges required to access this page.</p>
-          <Navigate to="/dashboard" replace />
-        </div>
-      </div>
-    );
+  if (requireAdmin && auth.role !== "ADMIN") {
+    return <Navigate to="/dashboard" replace />;
   }
 
   return children;
