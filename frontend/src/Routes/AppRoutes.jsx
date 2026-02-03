@@ -1,9 +1,9 @@
 import { Routes, Route } from "react-router-dom";
 import HomePage from "../pages/HomePage";
-import Login from "../pages/Login";
-import Register from "../pages/Register";
-import ForgotPassword from "../pages/ForgotPassword";
-import ResetPassword from "../pages/ResetPassword";
+import Login from "../pages/authentication/Login";
+import Register from "../pages/authentication/Register";
+import ForgotPassword from "../pages/authentication/ForgotPassword";
+import ResetPassword from "../pages/authentication/ResetPassword";
 import Dashboard from "../pages/Dashboard";
 import ProductsPage from "../pages/ProductPage";
 import CartPage from "../pages/CartPage";
@@ -15,7 +15,6 @@ import OrderConfirmation from "./../pages/OrderConfirmation";
 import ProductDetails from "../pages/ProductDetailsPage";
 import ProductDetailsPage from "../pages/ProductDetailsPage";
 import AdminCategories from "../pages/AdminCategories";
-
 const AppRoutes = () => (
   <Routes>
     <Route path="/" element={<HomePage />} />
@@ -86,16 +85,16 @@ const AppRoutes = () => (
           <ProductDetailsPage />
         </ProtectedRoute>
       }
-    /> 
+    />
 
     <Route
       path="/admin/categories"
       element={
         <ProtectedRoute>
-          <AdminCategories/>
+          <AdminCategories />
         </ProtectedRoute>
       }
-      />
+    />
   </Routes>
 );
 

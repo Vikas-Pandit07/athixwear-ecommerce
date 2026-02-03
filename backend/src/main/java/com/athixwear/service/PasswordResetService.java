@@ -95,7 +95,7 @@ public class PasswordResetService {
                     "Hello,\n\n" +
                             "You have requested to reset your password for AthixWear.\n\n" +
                             "Click the link below to reset your password:\n" +
-                            "http://localhost:5173/reset-password?token=" + token + "\n\n" +
+                            "http://localhost:5173/athixwear-ecommerce/reset-password?token=" + token + "\n\n" +
                             "This link will expire in 24 hours.\n\n" +
                             "If you didn't request this, please ignore this email.\n\n" +
                             "Best regards,\n" +

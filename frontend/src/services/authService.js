@@ -1,5 +1,4 @@
 import { apiRequest } from "./appClient";
-import { forgotPassword } from "./authService";
 
 // Login User
 export const loginUser = async (loginData) => {
@@ -39,7 +38,7 @@ export const forgotPassword = async (email) => {
 
   return await apiRequest("/api/auth/forgot-password", {
     method: "POST",
-    body: email,
+    body: {email},
   });
 };
 
