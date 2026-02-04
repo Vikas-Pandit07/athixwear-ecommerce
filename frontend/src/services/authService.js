@@ -38,7 +38,7 @@ export const forgotPassword = async (email) => {
 
   return await apiRequest("/api/auth/forgot-password", {
     method: "POST",
-    body: {email},
+    body: { email },
   });
 };
 

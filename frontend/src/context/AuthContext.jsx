@@ -1,10 +1,11 @@
-import { createContext, useContext, useEffect, useState } from "react";
-import { verifyAuth, logoutUser } from "../services/authService";
+import { createContext, useState, useEffect, useContext, useMemo } from "react";
+import { logoutUser, verifyAuth } from "../services/authService";
 
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
   const [auth, setAuth] = useState({
+    // initial state object
     user: null,
     isAuthenticated: false,
     isAdmin: false,
@@ -61,19 +62,19 @@ export const AuthProvider = ({ children }) => {
     refreshAuth();
   }, []);
 
-  return (
-    <AuthContext.Provider
-      value={{
-        ...auth,
-        refreshAuth,
-        logout,
-      }}
-    >
-      {children}
-    </AuthContext.Provider>
+  const value = useMemo(
+    () => ({
+      ...auth,
+      refreshAuth,
+      logout,
+    }),
+    [auth],
   );
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
+// custome hook for easy use
 export const useAuth = () => {
   const ctx = useContext(AuthContext);
   if (!ctx) {
