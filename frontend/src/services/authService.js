@@ -1,4 +1,4 @@
-import { apiRequest } from "./appClient";
+import { apiRequest } from "./apiClient";
 
 // Login User
 export const loginUser = async (loginData) => {

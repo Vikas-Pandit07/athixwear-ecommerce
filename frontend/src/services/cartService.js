@@ -1,4 +1,4 @@
-import { apiRequest } from "./appClient";
+import { apiRequest } from "./apiClient";
 
 // get full cart summary
 export const getCart = async () => {
