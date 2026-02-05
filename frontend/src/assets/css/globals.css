@@ -2,48 +2,48 @@
 
 /* ATHIXWEAR LUXE GEN-Z THEME */
 :root {
-  /* Core Palette - Luxe & Youthful */
-  --primary-50: #f8f5f0;
-  --primary-100: #f1ebe2;
-  --primary-200: #e5d9c8;
-  --primary-300: #d2c3ad;
-  --primary-400: #b7a486;
-  --primary-500: #9c8763;
-  --primary-600: #7e6b4d;
-  --primary-700: #5f523b;
-  --primary-800: #3e3628;
-  --primary-900: #1f1a14;
-  --primary-950: #120f0b;
+  /* Core Palette - Clean White + Sky Blue */
+  --primary-50: #f5fbff;
+  --primary-100: #eaf6ff;
+  --primary-200: #d6efff;
+  --primary-300: #b9e4ff;
+  --primary-400: #8fd4ff;
+  --primary-500: #5fc2ff;
+  --primary-600: #3aa7ff;
+  --primary-700: #1e85df;
+  --primary-800: #1566b0;
+  --primary-900: #0e4a80;
+  --primary-950: #0a365d;
 
-  /* Accent Colors - Gold + Cobalt Pop */
-  --accent-primary: #c9a227;
-  --accent-secondary: #3f5bff;
+  /* Accent Colors - Aqua + Blue */
+  --accent-primary: #3aa7ff;
+  --accent-secondary: #86dcff;
   --accent-success: #2fbf71;
   --accent-warning: #f2a93b;
   --accent-danger: #e25555;
-  --accent-info: #2db4d6;
+  --accent-info: #33b5e5;
 
   /* Semantic Colors */
-  --background: #f7f2ea;
-  --surface: #fff9f0;
+  --background: #f7fbff;
+  --surface: #ffffff;
   --surface-elevated: #ffffff;
-  --surface-inverse: #12100e;
-  --text-primary: #17130e;
-  --text-secondary: #5e544b;
-  --text-inverse: #fdf8f1;
-  --border: rgba(23, 19, 14, 0.12);
-  --border-hover: rgba(23, 19, 14, 0.22);
-  --border-active: #c9a227;
+  --surface-inverse: #0b1b2b;
+  --text-primary: #0b1b2b;
+  --text-secondary: #4c6172;
+  --text-inverse: #f7fbff;
+  --border: rgba(11, 27, 43, 0.12);
+  --border-hover: rgba(11, 27, 43, 0.22);
+  --border-active: #3aa7ff;
 
-  /* Gradients - Editorial */
-  --gradient-primary: linear-gradient(135deg, #12100e 0%, #3b2f22 100%);
-  --gradient-secondary: linear-gradient(135deg, #c9a227 0%, #f2c14e 100%);
-  --gradient-surface: linear-gradient(135deg, #fff9f0 0%, #f7f2ea 100%);
-  --gradient-dark: linear-gradient(135deg, #0f0c0a 0%, #1f1a14 100%);
+  /* Gradients - Airy */
+  --gradient-primary: linear-gradient(135deg, #2e9cff 0%, #7dd9ff 100%);
+  --gradient-secondary: linear-gradient(135deg, #86dcff 0%, #c8f2ff 100%);
+  --gradient-surface: linear-gradient(135deg, #ffffff 0%, #f3faff 100%);
+  --gradient-dark: linear-gradient(135deg, #0b1b2b 0%, #132b40 100%);
   --gradient-glow: linear-gradient(
     90deg,
     transparent,
-    rgba(201, 162, 39, 0.2),
+    rgba(58, 167, 255, 0.2),
     transparent
   );
 
@@ -90,17 +90,17 @@
   --space-3xl: 4rem;
 
   /* Legacy color aliases (used in existing CSS) */
-  --color-black: #12100e;
-  --color-white: #fff9f0;
-  --color-gold: #c9a227;
-  --color-light-gold: rgba(201, 162, 39, 0.15);
-  --color-dark-gold: #8e6b1d;
-  --color-gray: #6b6157;
-  --color-light-gray: #ede6dc;
-  --color-dark-gray: #2b241d;
+  --color-black: #0b1b2b;
+  --color-white: #ffffff;
+  --color-gold: #3aa7ff;
+  --color-light-gold: rgba(58, 167, 255, 0.15);
+  --color-dark-gold: #1e85df;
+  --color-gray: #5a6f80;
+  --color-light-gray: #eaf6ff;
+  --color-dark-gray: #1a2b3b;
   --color-danger: #e25555;
   --color-success: #2fbf71;
-  --color-info: #3f5bff;
+  --color-info: #33b5e5;
 
   /* Z-index layers */
   --z-dropdown: 1000;
@@ -174,19 +174,19 @@ body {
   background-color: var(--background);
   background-image:
     radial-gradient(
-      600px 300px at 20% -10%,
-      rgba(201, 162, 39, 0.18),
+      700px 360px at 15% -10%,
+      rgba(134, 220, 255, 0.35),
       transparent 60%
     ),
     radial-gradient(
-      500px 280px at 85% 0%,
-      rgba(63, 91, 255, 0.12),
+      620px 320px at 90% 0%,
+      rgba(46, 156, 255, 0.2),
       transparent 65%
     ),
     linear-gradient(
       180deg,
-      rgba(255, 249, 240, 0.95),
-      rgba(247, 242, 234, 0.92)
+      rgba(255, 255, 255, 0.98),
+      rgba(247, 251, 255, 0.95)
     );
   transition:
     background-color var(--transition-smooth),
