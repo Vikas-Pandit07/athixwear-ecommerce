@@ -8,6 +8,7 @@ const ForgotPassword = () => {
   const [loading, setLoading] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
   const [error, setError] = useState("");
+  const logoSrc = `${import.meta.env.BASE_URL}logo.svg`;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -35,6 +36,7 @@ const ForgotPassword = () => {
       {/* LEFT BRAND PANEL */}
       <div className="auth-left">
         <div className="auth-brand">
+          <img src={logoSrc} alt="AthixWear Logo" className="auth-logo-img" />
           <div className="auth-logo">ATHIXWEAR</div>
           <p className="auth-tagline">Secure Account Recovery</p>
           <p className="auth-description">

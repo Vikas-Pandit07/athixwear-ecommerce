@@ -12,6 +12,7 @@ const Register = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
+  const logoSrc = `${import.meta.env.BASE_URL}logo.svg`;
 
   const navigate = useNavigate();
 
@@ -71,7 +72,7 @@ const Register = () => {
       <div className="auth-split-left">
         <div className="brand-promo-v2">
           <div className="logo-animation">
-            <img src="/assets/logo10.png" alt="Athix Logo" />
+            <img src={logoSrc} alt="AthixWear Logo" className="auth-logo-img" />
           </div>
           <div className="brand-statement">
             <div className="auth-logo">ATHIXWEAR</div>

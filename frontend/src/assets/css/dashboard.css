@@ -11,7 +11,7 @@
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(4px);
+  backdrop-filter: none;
   z-index: var(--z-modal-backdrop);
   opacity: 0;
   visibility: hidden;
@@ -33,11 +33,12 @@
   background: var(--surface-elevated);
   border-right: 1px solid var(--border);
   z-index: var(--z-modal);
-  transition: transform var(--transition-smooth);
+  transition: transform 320ms ease;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
   box-shadow: var(--shadow-xl);
+  will-change: transform;
 }
 
 .sidebar.open {
@@ -306,8 +307,8 @@
   background: var(--surface-elevated);
   border-bottom: 1px solid var(--border);
   padding: var(--space-lg);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -533,16 +534,16 @@
 
 /* Categories */
 .category-section {
-  
-  padding: 10px;
-  background: whitesmoke;
+  padding: var(--space-sm) var(--space-lg);
+  background: var(--surface-elevated);
+  border-bottom: 1px solid var(--border);
 }
 
 .categories-scroll {
   display: flex;
-  justify-content: left;
-  gap: 10px;
-  margin-left: 20px;
+  justify-content: flex-start;
+  gap: var(--space-sm);
+  margin-left: 0;
   overflow-x: auto;
   padding-bottom: var(--space-xs);
   -ms-overflow-style: none;

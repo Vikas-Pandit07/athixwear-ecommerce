@@ -14,6 +14,7 @@ const ResetPassword = () => {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
+  const logoSrc = `${import.meta.env.BASE_URL}assist/logo10.png`;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -56,6 +57,7 @@ const ResetPassword = () => {
       {/* Left Panel */}
       <div className="auth-left">
         <div className="auth-brand">
+          <img src={logoSrc} alt="AthixWear Logo" className="auth-logo-img" />
           <div className="auth-logo">ATHIXWEAR</div>
           <p className="auth-tagline">Set New Password</p>
           <p className="auth-description">

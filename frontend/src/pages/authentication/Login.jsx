@@ -2,14 +2,17 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "../../assets/css/auth.css";
 import { loginUser } from "../../services/authService";
+import { useAuth } from "../../context/AuthContext";
 
 const Login = () => {
   const [usernameOrEmail, setUsernameOrEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const logoSrc = `${import.meta.env.BASE_URL}logo.svg`;
 
   const navigate = useNavigate();
+  const { refreshAuth } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -17,9 +20,9 @@ const Login = () => {
     setLoading(true);
 
     try {
-       await loginUser({ usernameOrEmail, password}); 
-        
-        navigate("/dashboard", { replace: true });
+       await loginUser({ usernameOrEmail, password});
+       await refreshAuth();
+       navigate("/dashboard", { replace: true });
     } catch (err) {
        setError(err.message || "Login failed");
     } finally {
@@ -32,7 +35,7 @@ const Login = () => {
       <div className="auth-split-left">
         <div className="brand-promo-v2">
           <div className="logo-animation">
-            {/* <img src="\assist\logo3.jpg" alt="Athix Logo" className="logo-img" /> */}
+            <img src={logoSrc} alt="AthixWear Logo" className="auth-logo-img" />
           </div>
           <div className="brand-statement">
             <div className="auth-logo">ATHIXWEAR</div>

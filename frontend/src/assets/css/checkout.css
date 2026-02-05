@@ -1,17 +1,17 @@
 /* checkout.css - Complete Styles */
 
 :root {
-  --color-black: #111111;
-  --color-white: #ffffff;
-  --color-gold: #D4AF37;
-  --color-light-gold: rgba(212, 175, 55, 0.1);
-  --color-dark-gold: #b8941f;
-  --color-gray: #666666;
-  --color-light-gray: #f5f5f5;
-  --color-dark-gray: #333333;
-  --color-danger: #d32f2f;
-  --color-success: #2e7d32;
-  --color-info: #1976d2;
+  --color-black: #12100e;
+  --color-white: #fff9f0;
+  --color-gold: #c9a227;
+  --color-light-gold: rgba(201, 162, 39, 0.12);
+  --color-dark-gold: #8e6b1d;
+  --color-gray: #6b6157;
+  --color-light-gray: #ede6dc;
+  --color-dark-gray: #2b241d;
+  --color-danger: #e25555;
+  --color-success: #2fbf71;
+  --color-info: #3f5bff;
   --shadow-light: 0 2px 10px rgba(0, 0, 0, 0.05);
   --shadow-medium: 0 4px 20px rgba(0, 0, 0, 0.1);
   --shadow-heavy: 0 8px 30px rgba(0, 0, 0, 0.15);
@@ -28,6 +28,7 @@
   margin: 0 auto;
   padding: 40px 20px;
   min-height: 80vh;
+  color: var(--text-primary);
   animation: fadeIn 0.5s ease-out;
 }
 
@@ -46,7 +47,7 @@
   text-align: center;
   margin-bottom: 40px;
   padding-bottom: 30px;
-  border-bottom: 2px solid rgba(17, 17, 17, 0.1);
+  border-bottom: 2px solid var(--border);
   position: relative;
 }
 
@@ -286,7 +287,7 @@
 
 /* Checkout Main */
 .checkout-main {
-  background: var(--color-white);
+  background: var(--surface-elevated);
   border-radius: var(--radius-xl);
   padding: 35px;
   box-shadow: var(--shadow-medium);
@@ -301,7 +302,7 @@
   left: 0;
   right: 0;
   height: 4px;
-  background: linear-gradient(90deg, var(--color-gold), var(--color-black));
+  background: linear-gradient(90deg, var(--color-gold), var(--color-dark-gold));
 }
 
 .checkout-step h2 {
@@ -919,11 +920,11 @@
 }
 
 .order-summary-card {
-  background: var(--color-white);
+  background: var(--surface-elevated);
   border-radius: var(--radius-xl);
   padding: 30px;
   box-shadow: var(--shadow-medium);
-  border: 1px solid rgba(17, 17, 17, 0.1);
+  border: 1px solid var(--border);
   position: relative;
   overflow: hidden;
 }
@@ -935,7 +936,7 @@
   left: 0;
   right: 0;
   height: 4px;
-  background: linear-gradient(90deg, var(--color-gold), var(--color-black));
+  background: linear-gradient(90deg, var(--color-gold), var(--color-dark-gold));
 }
 
 .order-summary-card h3 {
@@ -1325,109 +1326,107 @@
   }
 }
 
-/* Dark Mode Support */
-@media (prefers-color-scheme: dark) {
-  .checkout-page {
-    background: #121212;
-  }
-  
-  .checkout-main,
-  .order-summary-card,
-  .add-address-form,
-  .review-section,
-  .address-card,
-  .payment-option {
-    background: #1e1e1e;
-    border-color: #333;
-  }
-  
-  .checkout-step h2,
-  .address-card h4,
-  .payment-option-header h3,
-  .order-summary-card h3,
-  .review-section h3,
-  .cart-preview h4 {
-    color: #fff;
-  }
-  
-  .address-card p,
-  .payment-option-header p,
-  .payment-option-details p,
-  .review-address p,
-  .review-payment p,
-  .item-details p,
-  .more-items {
-    color: #bbb;
-  }
-  
-  .form-group label {
-    color: #ddd;
-  }
-  
-  .form-group input,
-  .form-group textarea,
-  .form-group select {
-    background: #2a2a2a;
-    border-color: #444;
-    color: #fff;
-  }
-  
-  .form-group input:focus,
-  .form-group textarea:focus,
-  .form-group select:focus {
-    border-color: var(--color-gold);
-    box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.2);
-  }
-  
-  .step-number {
-    background: #333;
-    color: #bbb;
-  }
-  
-  .step.active .step-number {
-    background: var(--color-gold);
-    color: #000;
-  }
-  
-  .step-divider {
-    background: linear-gradient(to right, #333, transparent);
-  }
-  
-  .select-btn {
-    background: #333;
-    color: #bbb;
-  }
-  
-  .address-card.selected .select-btn {
-    background: var(--color-success);
-    color: #fff;
-  }
-  
-  .change-btn {
-    border-color: #666;
-    color: #bbb;
-  }
-  
-  .change-btn:hover {
-    background: #fff;
-    border-color: #fff;
-    color: #000;
-  }
-  
-  .no-address {
-    background: #2a2a2a;
-    border-color: #444;
-    color: #bbb;
-  }
-  
-  .summary-row span:last-child,
-  .item-total {
-    color: #fff;
-  }
-  
-  .total-amount {
-    color: var(--color-gold);
-  }
+/* Dark Theme Support (match app theme) */
+[data-theme="dark"] .checkout-page {
+  background: var(--background);
+}
+
+[data-theme="dark"] .checkout-main,
+[data-theme="dark"] .order-summary-card,
+[data-theme="dark"] .add-address-form,
+[data-theme="dark"] .review-section,
+[data-theme="dark"] .address-card,
+[data-theme="dark"] .payment-option {
+  background: var(--surface-elevated);
+  border-color: var(--border);
+}
+
+[data-theme="dark"] .checkout-step h2,
+[data-theme="dark"] .address-card h4,
+[data-theme="dark"] .payment-option-header h3,
+[data-theme="dark"] .order-summary-card h3,
+[data-theme="dark"] .review-section h3,
+[data-theme="dark"] .cart-preview h4 {
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .address-card p,
+[data-theme="dark"] .payment-option-header p,
+[data-theme="dark"] .payment-option-details p,
+[data-theme="dark"] .review-address p,
+[data-theme="dark"] .review-payment p,
+[data-theme="dark"] .item-details p,
+[data-theme="dark"] .more-items {
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .form-group label {
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .form-group input,
+[data-theme="dark"] .form-group textarea,
+[data-theme="dark"] .form-group select {
+  background: var(--surface);
+  border-color: var(--border);
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .form-group input:focus,
+[data-theme="dark"] .form-group textarea:focus,
+[data-theme="dark"] .form-group select:focus {
+  border-color: var(--color-gold);
+  box-shadow: 0 0 0 3px rgba(201, 162, 39, 0.2);
+}
+
+[data-theme="dark"] .step-number {
+  background: var(--surface);
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .step.active .step-number {
+  background: var(--color-gold);
+  color: #120f0b;
+}
+
+[data-theme="dark"] .step-divider {
+  background: linear-gradient(to right, var(--border), transparent);
+}
+
+[data-theme="dark"] .select-btn {
+  background: var(--surface);
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .address-card.selected .select-btn {
+  background: var(--color-success);
+  color: var(--text-inverse);
+}
+
+[data-theme="dark"] .change-btn {
+  border-color: var(--border);
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .change-btn:hover {
+  background: var(--surface-elevated);
+  border-color: var(--border-hover);
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .no-address {
+  background: var(--surface);
+  border-color: var(--border);
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .summary-row span:last-child,
+[data-theme="dark"] .item-total {
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .total-amount {
+  color: var(--color-gold);
 }
 
 /* Animation Enhancements */

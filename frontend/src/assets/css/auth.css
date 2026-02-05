@@ -1,12 +1,15 @@
 .auth-page {
   display: flex;
   min-height: 100vh;
-  background: var(--color-white);
+  background: var(--background);
+  color: var(--text-primary);
 }
 
 .auth-split-left {
   flex: 1;
-  background: radial-gradient(circle at center, #1a1a1a 0%, #0d0d0d 100%);
+  background:
+    radial-gradient(600px 320px at 15% 20%, rgba(201, 162, 39, 0.25), transparent 60%),
+    linear-gradient(135deg, #0f0c0a 0%, #2a211a 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -20,23 +23,27 @@
   position: absolute;
   width: 400px;
   height: 400px;
-  background: radial-gradient(circle, rgba(212, 175, 55, 0.08) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(201, 162, 39, 0.12) 0%, transparent 70%);
 }
 
 .brand-promo-v2 {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
   text-align: center;
   z-index: 2;
   color: var(--color-white);
 }
 
 .logo-animation {
-  margin-bottom: 2rem;
+  margin-bottom: 0.75rem;
 }
 
 .logo-animation img {
-  max-width: 200px;
+  max-width: 180px;
   height: auto;
-  filter: brightness(0) invert(1);
+  filter: drop-shadow(0 8px 20px rgba(201, 162, 39, 0.35)) brightness(1.08) contrast(1.08);
 }
 
 .brand-statement {
@@ -48,8 +55,9 @@
   font-weight: 900;
   letter-spacing: 8px;
   color: var(--color-gold);
-  margin-bottom: 1rem;
+  margin-bottom: 0.5rem;
   text-transform: uppercase;
+  font-family: var(--font-display);
 }
 
 .luxury-subtitle {
@@ -65,13 +73,40 @@
   align-items: center;
   justify-content: center;
   padding: 40px;
-  background: var(--color-white);
+  background: var(--surface);
 }
 
 .form-wrapper {
   width: 100%;
   max-width: 400px;
   position: relative;
+}
+
+.error-toast {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 12px 14px;
+  margin-bottom: 1rem;
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(226, 85, 85, 0.35);
+  background: rgba(226, 85, 85, 0.08);
+  color: var(--color-danger);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.error-toast .error-icon {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--color-danger);
+  color: var(--text-inverse);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  font-weight: 700;
 }
 
 /* Form Validation Errors */
@@ -113,11 +148,11 @@
 .brand-identity h2 {
   font-size: 2rem;
   margin-bottom: 0.5rem;
-  color: var(--color-black);
+  color: var(--text-primary);
 }
 
 .brand-subtitle {
-  color: var(--color-gray);
+  color: var(--text-secondary);
   font-size: 0.9rem;
   letter-spacing: 2px;
   text-transform: uppercase;
@@ -125,6 +160,13 @@
 
 .fashion-form {
   width: 100%;
+}
+
+.fashion-form .btn-luxury {
+  width: 100%;
+  padding: 16px 24px;
+  font-size: 0.95rem;
+  margin-top: 8px;
 }
 
 .floating-group {
@@ -135,18 +177,18 @@
 .f-input {
   width: 100%;
   padding: 18px 16px 10px;
-  border: 2px solid #eee;
+  border: 2px solid var(--border);
   border-radius: var(--radius-md);
   font-size: 1rem;
-  color: var(--color-black);
-  background: var(--color-white);
+  color: var(--text-primary);
+  background: var(--surface-elevated);
   transition: var(--transition);
 }
 
 .f-input:focus {
   outline: none;
-  border-color: var(--color-black);
-  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
+  border-color: var(--color-gold);
+  box-shadow: 0 0 0 3px rgba(201, 162, 39, 0.2);
 }
 
 .f-input.error {
@@ -158,11 +200,11 @@
   top: 50%;
   left: 16px;
   transform: translateY(-50%);
-  color: var(--color-gray);
+  color: var(--text-secondary);
   font-size: 1rem;
   pointer-events: none;
   transition: var(--transition);
-  background: var(--color-white);
+  background: var(--surface-elevated);
   padding: 0 5px;
 }
 
@@ -170,7 +212,7 @@
 .f-input:not(:placeholder-shown) ~ .f-label {
   top: 8px;
   font-size: 0.75rem;
-  color: var(--color-black);
+  color: var(--text-primary);
   font-weight: 600;
   letter-spacing: 1px;
 }
@@ -190,24 +232,24 @@
 }
 
 .forgot-password {
-  color: var(--color-gray);
+  color: var(--text-secondary);
   font-size: 0.85rem;
   text-decoration: underline;
 }
 
 .forgot-password:hover {
-  color: var(--color-black);
+  color: var(--text-primary);
 }
 
 .footer-link {
   text-align: center;
   margin-top: 1.5rem;
-  color: var(--color-gray);
+  color: var(--text-secondary);
   font-size: 0.9rem;
 }
 
 .footer-link a {
-  color: var(--color-black);
+  color: var(--text-primary);
   font-weight: 700;
   text-decoration: underline;
 }
@@ -231,6 +273,15 @@
   text-align: center;
   z-index: 2;
   color: var(--color-white);
+}
+
+.auth-logo-img {
+  width: 160px;
+  height: auto;
+  object-fit: contain;
+  margin: 0 auto 0.75rem;
+  display: block;
+  filter: drop-shadow(0 8px 18px rgba(201, 162, 39, 0.35)) brightness(1.08) contrast(1.08);
 }
 
 .auth-tagline {
@@ -267,10 +318,15 @@
   font-size: 1.8rem;
   margin-bottom: 2rem;
   text-align: center;
-  color: var(--color-black);
+  color: var(--text-primary);
 }
 
 .auth-form {
+  width: 100%;
+}
+
+.auth-form .btn,
+.auth-form .btn-luxury {
   width: 100%;
 }
 
@@ -282,7 +338,7 @@
   display: block;
   font-size: 0.85rem;
   font-weight: 600;
-  color: var(--color-black);
+  color: var(--text-primary);
   margin-bottom: 0.5rem;
   text-transform: uppercase;
   letter-spacing: 1px;
@@ -291,7 +347,7 @@
 .password-hint {
   display: block;
   margin-top: 0.5rem;
-  color: var(--color-gray);
+  color: var(--text-secondary);
   font-size: 0.8rem;
   line-height: 1.4;
 }
@@ -299,12 +355,12 @@
 .auth-link {
   text-align: center;
   margin-top: 1.5rem;
-  color: var(--color-gray);
+  color: var(--text-secondary);
   font-size: 0.9rem;
 }
 
 .auth-link a {
-  color: var(--color-black);
+  color: var(--text-primary);
   font-weight: 700;
   text-decoration: underline;
 }
@@ -340,15 +396,15 @@
 }
 
 .email-sent-message p {
-  color: var(--color-gray);
+  color: var(--text-secondary);
   line-height: 1.6;
   margin-bottom: 1rem;
 }
 
 .email-note {
   font-size: 0.9rem;
-  color: var(--color-gray);
-  background: var(--color-light-gray);
+  color: var(--text-secondary);
+  background: var(--surface);
   padding: 1rem;
   border-radius: var(--radius-md);
   border-left: 4px solid var(--color-gold);
@@ -392,7 +448,7 @@
 }
 
 .reset-options p {
-  color: var(--color-gray);
+  color: var(--text-secondary);
   margin-bottom: 1.5rem;
 }
 
@@ -413,13 +469,13 @@
 }
 
 .success-message p {
-  color: var(--color-gray);
+  color: var(--text-secondary);
   margin-bottom: 1rem;
 }
 
 .redirect-note {
   font-size: 0.9rem;
-  color: var(--color-gray);
+  color: var(--text-secondary);
   font-style: italic;
   margin-bottom: 1.5rem;
 }

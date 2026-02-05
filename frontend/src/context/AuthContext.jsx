@@ -17,6 +17,7 @@ export const AuthProvider = ({ children }) => {
       const data = await verifyAuth();
 
       if (data.authenticated) {
+        const role = (data.role || "").toString().toUpperCase();
         setAuth({
           user: {
             username: data.username,
@@ -24,7 +25,7 @@ export const AuthProvider = ({ children }) => {
             role: data.role,
           },
           isAuthenticated: true,
-          isAdmin: data.role === "ADMIN",
+          isAdmin: role.includes("ADMIN"),
           loading: false,
         });
       } else {

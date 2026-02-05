@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import HomePage from "../pages/HomePage";
 import Login from "../pages/authentication/Login";
 import Register from "../pages/authentication/Register";
@@ -8,12 +8,12 @@ import Dashboard from "../pages/Dashboard";
 import ProductsPage from "../pages/ProductPage";
 import CartPage from "../pages/CartPage";
 import Profile from "../pages/Profile";
-import AdminDashboard from "../pages/AdminDashboard";
 import ProtectedRoute from "./ProtectedRoute";
 import CheckoutPage from "../pages/CheckoutPage";
 import OrderConfirmation from "../pages/OrderConfirmation";
 import ProductDetailsPage from "../pages/ProductDetailsPage";
 import AdminCategories from "../pages/AdminCategories";
+import AdminDashboard from "../pages/AdminDashboard";
 const AppRoutes = () => (
   <Routes>
     <Route path="/" element={<HomePage />} />
@@ -34,6 +34,14 @@ const AppRoutes = () => (
 
     <Route
       path="/admin"
+      element={
+        <ProtectedRoute requireAdmin={true}>
+          <Navigate to="/admin/dashboard" replace />
+        </ProtectedRoute>
+      }
+    />
+    <Route
+      path="/admin/dashboard"
       element={
         <ProtectedRoute requireAdmin={true}>
           <AdminDashboard />
@@ -89,7 +97,7 @@ const AppRoutes = () => (
     <Route
       path="/admin/categories"
       element={
-        <ProtectedRoute>
+        <ProtectedRoute requireAdmin={true}>
           <AdminCategories />
         </ProtectedRoute>
       }
