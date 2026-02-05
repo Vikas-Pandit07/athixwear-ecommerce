@@ -14,7 +14,7 @@ export const addToCart = async ({ productId, quantity }) => {
 };
 
 // update cart item quantity
-export const updateCartQuantity = async ({ itemId, quantity }) => {
+export const updateCartItemQuantity = async ({ itemId, quantity }) => {
   return await apiRequest(`/api/cart/items/${itemId}`, {
     method: "PUT",
     body: { quantity },
