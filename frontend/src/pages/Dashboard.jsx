@@ -18,6 +18,46 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const sidebarRef = useRef(null);
   const logoSrc = `${import.meta.env.BASE_URL}logo.svg`;
+  const categoryImages = {
+    all: `${import.meta.env.BASE_URL}all.png`,
+    footwear: `${import.meta.env.BASE_URL}shoe.png`,
+    women: `${import.meta.env.BASE_URL}ladies-dress.png`,
+    men: `${import.meta.env.BASE_URL}shirt.png`,
+  };
+
+  const getCategoryImage = (category) => {
+    const key = String(category || "").toLowerCase();
+
+    if (categoryImages[key]) {
+      return categoryImages[key];
+    }
+
+    if (key.includes("shoe") || key.includes("footwear")) {
+      return categoryImages.shoes;
+    }
+
+    if (key.includes("tshirt") || key.includes("t-shirt")) {
+      return categoryImages.tshirt;
+    }
+
+    if (key.includes("shirt")) {
+      return categoryImages.shirt;
+    }
+
+    if (key.includes("women") || key.includes("ladies")) {
+      return categoryImages.women;
+    }
+
+    if (key.includes("cap") || key.includes("hat")) {
+      return categoryImages.caps;
+    }
+
+    if (key.includes("men")) {
+      return categoryImages.men;
+    }
+
+    return categoryImages.all;
+  };
 
   // Toggle theme
   const toggleTheme = () => {
@@ -467,6 +507,9 @@ const Dashboard = () => {
                   className={`category-btn ${activeCategory === cat ? "active" : ""}`}
                   onClick={() => handleCategoryChange(cat)}
                 >
+                  <span className="category-icon">
+                    <img src={getCategoryImage(cat)} alt={`${cat} icon`} />
+                  </span>
                   <span className="category-name">{cat}</span>
                   {activeCategory === cat && (
                     <span className="active-indicator" />
