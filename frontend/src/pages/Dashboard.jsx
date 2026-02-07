@@ -9,7 +9,7 @@ const Dashboard = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
-  const [categories, setCategories] = useState(["All"]);
+  const [categories, setCategories] = useState([{ name: "All", empty: false }]);
   const [userInfo, setUserInfo] = useState({ username: "Guest" });
   const [loading, setLoading] = useState(true);
   const [cartCount, setCartCount] = useState(0);
@@ -20,8 +20,15 @@ const Dashboard = () => {
   const logoSrc = `${import.meta.env.BASE_URL}logo.svg`;
   const categoryImages = {
     all: `${import.meta.env.BASE_URL}all.png`,
+    shoes: `${import.meta.env.BASE_URL}shoe.png`,
     footwear: `${import.meta.env.BASE_URL}shoe.png`,
+    shirt: `${import.meta.env.BASE_URL}shirt.png`,
+    tshirt: `${import.meta.env.BASE_URL}tshirt.png`,
+    "t-shirt": `${import.meta.env.BASE_URL}tshirt.png`,
     women: `${import.meta.env.BASE_URL}ladies-dress.png`,
+    ladies: `${import.meta.env.BASE_URL}ladies-dress.png`,
+    caps: `${import.meta.env.BASE_URL}cap.png`,
+    cap: `${import.meta.env.BASE_URL}cap.png`,
     men: `${import.meta.env.BASE_URL}shirt.png`,
   };
 
@@ -126,24 +133,76 @@ const Dashboard = () => {
         const data = await response.json();
         setProducts(data || []);
 
-        // Extract unique categories
-        const allCategories = ["All"];
+        // Update categories list and mark empties
         const uniqueCategories = new Set();
-
         (data || []).forEach((product) => {
-          if (product.category && !uniqueCategories.has(product.category)) {
+          if (product.category) {
             uniqueCategories.add(product.category);
-            allCategories.push(product.category);
           }
         });
 
-        setCategories(allCategories);
+        setCategories((prev) => {
+          const existing = prev.filter((cat) => cat.name !== "All");
+          const merged = new Map();
+
+          existing.forEach((cat) => {
+            merged.set(cat.name, {
+              name: cat.name,
+              empty: !uniqueCategories.has(cat.name),
+            });
+          });
+
+          uniqueCategories.forEach((catName) => {
+            merged.set(catName, { name: catName, empty: false });
+          });
+
+          return [{ name: "All", empty: false }, ...Array.from(merged.values())];
+        });
+
         filterProducts(data || []);
       }
     } catch (error) {
       console.error("Error fetching products:", error);
     } finally {
       setLoading(false);
+    }
+  }, []);
+
+  const fetchCategories = useCallback(async () => {
+    try {
+      const response = await fetch("http://localhost:9090/api/categories", {
+        method: "GET",
+        credentials: "include",
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        const list = data?.data || data || [];
+        const categoryNames = list
+          .map((cat) => cat?.name || cat?.categoryName || cat?.category)
+          .filter(Boolean);
+
+        setCategories((prev) => {
+          const merged = new Map();
+
+          categoryNames.forEach((catName) => {
+            merged.set(catName, { name: catName, empty: true });
+          });
+
+          prev
+            .filter((cat) => cat.name !== "All")
+            .forEach((cat) => {
+              merged.set(cat.name, {
+                name: cat.name,
+                empty: cat.empty ?? true,
+              });
+            });
+
+          return [{ name: "All", empty: false }, ...Array.from(merged.values())];
+        });
+      }
+    } catch (error) {
+      console.error("Error fetching categories:", error);
     }
   }, []);
 
@@ -187,10 +246,15 @@ const Dashboard = () => {
   // Initial data fetch
   useEffect(() => {
     const fetchData = async () => {
-      await Promise.all([fetchProducts(), fetchUserInfo(), fetchCartCount()]);
+      await Promise.all([
+        fetchProducts(),
+        fetchCategories(),
+        fetchUserInfo(),
+        fetchCartCount(),
+      ]);
     };
     fetchData();
-  }, [fetchProducts, fetchUserInfo, fetchCartCount]);
+  }, [fetchProducts, fetchCategories, fetchUserInfo, fetchCartCount]);
 
   // Update cart count
   const updateCartCount = useCallback(() => {
@@ -254,6 +318,10 @@ const Dashboard = () => {
     filterProducts(products, "All", "");
     setSidebarOpen(false);
   };
+
+  const activeCategoryInfo = categories.find(
+    (category) => category.name === activeCategory,
+  );
 
   return (
     <div
@@ -503,15 +571,18 @@ const Dashboard = () => {
               </button>
               {categories.map((cat) => (
                 <button
-                  key={cat}
-                  className={`category-btn ${activeCategory === cat ? "active" : ""}`}
-                  onClick={() => handleCategoryChange(cat)}
+                  key={cat.name}
+                  className={`category-btn ${activeCategory === cat.name ? "active" : ""}`}
+                  onClick={() => handleCategoryChange(cat.name)}
                 >
                   <span className="category-icon">
-                    <img src={getCategoryImage(cat)} alt={`${cat} icon`} />
+                    <img src={getCategoryImage(cat.name)} alt={`${cat.name} icon`} />
                   </span>
-                  <span className="category-name">{cat}</span>
-                  {activeCategory === cat && (
+                  <span className="category-name">{cat.name}</span>
+                  {cat.empty && cat.name !== "All" && (
+                    <span className="category-empty">Empty</span>
+                  )}
+                  {activeCategory === cat.name && (
                     <span className="active-indicator" />
                   )}
                 </button>
@@ -581,7 +652,11 @@ const Dashboard = () => {
             <div className="no-products">
               <div className="no-products-icon">🔍</div>
               <h3>No products found</h3>
-              <p>Try adjusting your search or filter</p>
+              <p>
+                {activeCategoryInfo?.empty && activeCategory !== "All"
+                  ? "This category is empty. Add products to see them here."
+                  : "Try adjusting your search or filter."}
+              </p>
               <button
                 className="btn-primary"
                 onClick={() => {
@@ -608,3 +683,4 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
+

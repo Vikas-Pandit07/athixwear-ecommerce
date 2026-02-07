@@ -688,6 +688,13 @@
   letter-spacing: 0.04em;
 }
 
+.category-empty {
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: var(--accent-danger);
+  letter-spacing: 0.03em;
+}
+
 .category-btn:hover {
   color: var(--text-primary);
   transform: translateY(-2px);

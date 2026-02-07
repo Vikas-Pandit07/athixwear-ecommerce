@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useState } from "react";
 import { useAuth } from "./AuthContext";
 import {
   addToCart,
@@ -29,7 +29,7 @@ export const CartProvider = ({ children }) => {
     return { itemCount, totalAmount };
   };
 
-  const refreshCart = async () => {
+  const refreshCart = useCallback(async () => {
     if (!isAuthenticated) {
       setCart({
         items: [],
@@ -50,11 +50,13 @@ export const CartProvider = ({ children }) => {
           ...totals,
           loading: false,
         });
+      } else {
+        setCart((prev) => ({ ...prev, loading: false }));
       }
     } catch (err) {
       setCart((prev) => ({ ...prev, loading: false }));
     }
-  };
+  }, [isAuthenticated]);
 
   const addItem = async (productId, quantity = 1) => {
     await addToCart({ productId, quantity });
@@ -78,7 +80,18 @@ export const CartProvider = ({ children }) => {
 
   useEffect(() => {
     refreshCart();
-  }, [isAuthenticated]);
+  }, [refreshCart]);
+
+  useEffect(() => {
+    const handleCartUpdated = () => {
+      refreshCart();
+    };
+
+    window.addEventListener("cartUpdated", handleCartUpdated);
+    return () => {
+      window.removeEventListener("cartUpdated", handleCartUpdated);
+    };
+  }, [refreshCart]);
 
   return (
     <CartContext.Provider

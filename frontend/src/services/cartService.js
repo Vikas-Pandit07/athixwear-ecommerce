@@ -30,7 +30,7 @@ export const removeCartItem = async (itemId) => {
 
 // clear entire cart
 export const clearCart = async () => {
-  return await apiRequest("/api/cart/", {
+  return await apiRequest("/api/cart", {
     method: "DELETE",
   });
 };
