@@ -5,7 +5,6 @@ import "../assets/css/cart.css";
 
 const CURRENCY = "\u20B9";
 const FREE_SHIPPING_MIN = 1000;
-const SHIPPING_FEE = 50;
 
 const CartPage = () => {
   const navigate = useNavigate();
@@ -13,19 +12,17 @@ const CartPage = () => {
   const [message, setMessage] = useState({ type: "", text: "" });
 
   const {
-    items = [],
-    itemCount = 0,
-    totalAmount = 0,
+    items,
+    itemCount,
+    subtotal,
+    shipping,
+    total,
     loading,
+    updatingItemId,
     updateItem,
     removeItem,
     clearAll,
   } = useCart();
-
-  const subtotal = Number(totalAmount || 0);
-  const shipping =
-    subtotal >= FREE_SHIPPING_MIN || items.length === 0 ? 0 : SHIPPING_FEE;
-  const total = subtotal + shipping;
 
   const amountLeftForFreeShipping = useMemo(
     () => Math.max(0, FREE_SHIPPING_MIN - subtotal),
