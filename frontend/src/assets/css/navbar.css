@@ -1,0 +1,115 @@
+﻿.navbar {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-sticky);
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.95) 0%,
+    rgba(234, 246, 255, 0.9) 45%,
+    rgba(255, 255, 255, 0.95) 100%
+  );
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+}
+
+.navbar-inner {
+  min-height: 74px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+}
+
+.navbar-left {
+  display: flex;
+  align-items: center;
+}
+
+.brand {
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  background: linear-gradient(120deg, #0b1b2b 0%, #1e85df 55%, #0b1b2b 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.navbar-right {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.nav-link-item {
+  font-weight: 600;
+  color: var(--text-secondary);
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--radius-full);
+  transition: all var(--transition-fast);
+}
+
+.nav-link-item:hover {
+  color: var(--text-primary);
+  background: var(--surface);
+}
+
+.cart-link {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.cart-badge {
+  min-width: 1.25rem;
+  height: 1.25rem;
+  border-radius: var(--radius-full);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0 0.35rem;
+  background: var(--gradient-primary);
+  color: #fff;
+  line-height: 1;
+  box-shadow: var(--shadow-sm);
+}
+
+.nav-auth-btn {
+  padding: 0.55rem 1rem;
+  font-size: 0.78rem;
+}
+
+@media (max-width: 768px) {
+  .navbar-inner {
+    min-height: 64px;
+    padding-top: 0.35rem;
+    padding-bottom: 0.35rem;
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .navbar-right {
+    width: 100%;
+    justify-content: flex-start;
+    gap: 0.4rem;
+  }
+
+  .brand {
+    font-size: 1.12rem;
+    letter-spacing: 0.1em;
+  }
+
+  .nav-link-item,
+  .nav-auth-btn {
+    font-size: 0.82rem;
+  }
+}
