@@ -18,7 +18,6 @@ const CartPage = () => {
     shipping,
     total,
     loading,
-    updatingItemId,
     updateItem,
     removeItem,
     clearAll,
