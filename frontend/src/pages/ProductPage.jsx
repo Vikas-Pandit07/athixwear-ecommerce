@@ -1,4 +1,3 @@
-// pages/ProductPage.jsx
 import React, { useState, useEffect } from 'react';
 import '../assets/css/products.css';
 import ProductCard from '../components/ui/ProductCard';
