@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
-import { resetPassword } from "../../services/authService";
+import { resetPassword } from "../../api/authService";
 import "../../assets/css/auth.css";
 
 const ResetPassword = () => {

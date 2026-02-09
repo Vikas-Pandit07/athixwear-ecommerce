@@ -1,7 +1,7 @@
 import { apiRequest } from "./apiClient";
 
 // get all products by category
-export const getAllProducts = async ({ category } = {}) => {
+export const getProducts = async ({ category } = {}) => {
   let url = "/api/products";
 
   if (category && category !== "All") {

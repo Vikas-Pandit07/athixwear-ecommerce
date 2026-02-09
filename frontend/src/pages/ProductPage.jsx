@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import '../assets/css/products.css';
 import ProductCard from '../components/ui/ProductCard';
-import { getAllProducts } from '../services/productService';
+import { getProducts } from '../api/productService';
 
 const ProductPage = () => {
   const [products, setProducts] = useState([]);
@@ -24,7 +24,7 @@ const ProductPage = () => {
       setLoading(true);
       setError("");
     
-      const data = await getAllProducts({
+      const data = await getProducts({
         category: filters.category,
       });
 

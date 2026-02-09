@@ -12,7 +12,7 @@ import {
   getCart,
   removeCartItem,
   updateCartItemQuantity,
-} from "../services/cartService";
+} from "../api/cartService";
 
 const CartContext = createContext(null);
 

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { forgotPassword } from "../../services/authService";
+import { forgotPassword } from "../../api/authService";
 import "../../assets/css/auth.css";
 
 const ForgotPassword = () => {
