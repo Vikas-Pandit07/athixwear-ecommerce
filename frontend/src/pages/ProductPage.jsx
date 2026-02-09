@@ -1,11 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import '../assets/css/products.css';
 import ProductCard from '../components/ui/ProductCard';
+import { getAllProducts } from '../services/productService';
 
 const ProductPage = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+
   const [filters, setFilters] = useState({
     category: 'All',
     sortBy: 'featured',
@@ -14,30 +16,22 @@ const ProductPage = () => {
   });
 
   useEffect(() => {
-    fetchProducts();
+    loadProducts();
   }, [filters.category]);
 
-  const fetchProducts = async () => {
+  const loadProducts = async () => {
     try {
       setLoading(true);
-      const url = filters.category === 'All' 
-        ? 'http://localhost:9090/api/products'
-        : `http://localhost:9090/api/products?category=${filters.category}`;
-      
-      const response = await fetch(url, {
-        method: 'GET',
-        credentials: 'include'
+      setError("");
+    
+      const data = await getAllProducts({
+        category: filters.category,
       });
 
-      if (response.ok) {
-        const data = await response.json();
-        setProducts(data);
-      } else {
-        setError('Failed to load products');
-      }
+      setProducts(data || []);
     } catch (err) {
-      console.error('Error fetching products:', err);
-      setError('Error loading products');
+      console.error('Product load failed:', err);
+      setError('Failed to load products');
     } finally {
       setLoading(false);
     }
@@ -46,6 +40,40 @@ const ProductPage = () => {
   const handleFilterChange = (key, value) => {
     setFilters(prev => ({ ...prev, [key]: value }));
   };
+
+  const visibleProducts = useMemo(() => {
+    const [minPrice, maxPrice] = filters.priceRange.map((value) => {
+      const numericValue = Number(value);
+      return Number.isFinite(numericValue) ? numericValue : 0;
+    });
+
+    const filtered = products.filter((product) => {
+      const price = Number(product.price) || 0;
+      const inStock = typeof product.stock === 'number'
+        ? product.stock > 0
+        : product.inStock !== false;
+
+      if (price < minPrice || price > maxPrice) return false;
+      if (filters.inStock && !inStock) return false;
+      return true;
+    });
+
+    return filtered.sort((a, b) => {
+      const priceA = Number(a.price) || 0;
+      const priceB = Number(b.price) || 0;
+
+      if (filters.sortBy === 'price-low') return priceA - priceB;
+      if (filters.sortBy === 'price-high') return priceB - priceA;
+
+      if (filters.sortBy === 'newest') {
+        const dateA = new Date(a.createdAt || a.updatedAt || 0).getTime();
+        const dateB = new Date(b.createdAt || b.updatedAt || 0).getTime();
+        return dateB - dateA;
+      }
+
+      return 0;
+    });
+  }, [products, filters]);
 
   if (loading) {
     return (
@@ -131,7 +159,7 @@ const ProductPage = () => {
         </div>
       </div>
 
-      {products.length === 0 ? (
+      {visibleProducts.length === 0 ? (
         <div className="no-results">
           <div className="no-results-icon">🔍</div>
           <h3>No Products Found</h3>
@@ -145,7 +173,7 @@ const ProductPage = () => {
         </div>
       ) : (
         <div className="products-grid">
-          {products.map(product => (
+          {visibleProducts.map(product => (
             <ProductCard
               key={product.productId}
               productId={product.productId}

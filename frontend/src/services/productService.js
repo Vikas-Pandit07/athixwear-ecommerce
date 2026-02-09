@@ -15,7 +15,7 @@ export const getAllProducts = async ({ category } = {}) => {
 
 // get product by ID
 export const getProductById = async (productId) => {
-  return await apiRequest(`api/products/${productId}`, {
+  return await apiRequest(`/api/products/${productId}`, {
     method: "GET",
   });
 };
