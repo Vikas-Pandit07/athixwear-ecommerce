@@ -26,121 +26,61 @@ public class CategoryController {
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> createCategory(@RequestBody CategoryRequest request) {
-        try {
-            CategoryResponse response = categoryService.createCategory(request);
-            Map<String, Object> result = new HashMap<>();
-            result.put("success", true);
-            result.put("message", "Category created successfully");
-            result.put("data", response);
-            return ResponseEntity.status(HttpStatus.CREATED).body(result);
-        } catch (Exception e) {
-            Map<String, Object> error = new HashMap<>();
-            error.put("success", false);
-            error.put("error", e.getMessage());
-            return ResponseEntity.badRequest().body(error);
-        }
+        CategoryResponse response = categoryService.createCategory(request);
+        Map<String, Object> result = new HashMap<>();
+        result.put("success", true);
+        result.put("message", "Category created successfully");
+        result.put("data", response);
+        return ResponseEntity.status(HttpStatus.CREATED).body(result);
     }
 
     @GetMapping
     public ResponseEntity<?> getAllCategories() {
-        try {
-            List<CategoryResponse> categories = categoryService.getAllCategories();
-            Map<String, Object> result = new HashMap<>();
-            result.put("success", true);
-            result.put("data", categories);
-            result.put("count", categories.size());
-            return ResponseEntity.ok(result);
-        } catch (Exception e) {
-            Map<String, Object> error = new HashMap<>();
-            error.put("success", false);
-            error.put("error", "Failed to fetch categories");
-            return ResponseEntity.internalServerError().body(error);
-        }
+        List<CategoryResponse> categories = categoryService.getAllCategories();
+        Map<String, Object> result = new HashMap<>();
+        result.put("success", true);
+        result.put("data", categories);
+        result.put("count", categories.size());
+        return ResponseEntity.ok(result);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getCategoryById(@PathVariable int id) {
-        try {
-            return categoryService.getCategoryById(id)
-                    .map(category -> {
-                        Map<String, Object> result = new HashMap<>();
-                        result.put("success", true);
-                        result.put("data", category);
-                        return ResponseEntity.ok(result);
-                    })
-                    .orElseGet(() -> {
-                        Map<String, Object> error = new HashMap<>();
-                        error.put("success", false);
-                        error.put("error", "Category not found");
-                        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
-                    });
-        } catch (Exception e) {
-            Map<String, Object> error = new HashMap<>();
-            error.put("success", false);
-            error.put("error", "Failed to fetch category");
-            return ResponseEntity.internalServerError().body(error);
-        }
+        CategoryResponse category = categoryService.getCategoryById(id);
+        Map<String, Object> result = new HashMap<>();
+        result.put("success", true);
+        result.put("data", category);
+        return ResponseEntity.ok(result);
     }
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> updateCategory(@PathVariable int id, @RequestBody CategoryRequest request) {
-        try {
-            CategoryResponse response = categoryService.updateCategory(id, request);
-            Map<String, Object> result = new HashMap<>();
-            result.put("success", true);
-            result.put("message", "Category updated successfully");
-            result.put("data", response);
-            return ResponseEntity.ok(result);
-        } catch (RuntimeException e) {
-            Map<String, Object> error = new HashMap<>();
-            error.put("success", false);
-            error.put("error", e.getMessage());
-            return ResponseEntity.badRequest().body(error);
-        } catch (Exception e) {
-            Map<String, Object> error = new HashMap<>();
-            error.put("success", false);
-            error.put("error", "Failed to update category");
-            return ResponseEntity.internalServerError().body(error);
-        }
+        CategoryResponse response = categoryService.updateCategory(id, request);
+        Map<String, Object> result = new HashMap<>();
+        result.put("success", true);
+        result.put("message", "Category updated successfully");
+        result.put("data", response);
+        return ResponseEntity.ok(result);
     }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> deleteCategory(@PathVariable int id) {
-        try {
-            categoryService.deleteCategory(id);
-            Map<String, Object> result = new HashMap<>();
-            result.put("success", true);
-            result.put("message", "Category deleted successfully");
-            return ResponseEntity.ok(result);
-        } catch (RuntimeException e) {
-            Map<String, Object> error = new HashMap<>();
-            error.put("success", false);
-            error.put("error", e.getMessage());
-            return ResponseEntity.badRequest().body(error);
-        } catch (Exception e) {
-            Map<String, Object> error = new HashMap<>();
-            error.put("success", false);
-            error.put("error", "Failed to delete category");
-            return ResponseEntity.internalServerError().body(error);
-        }
+        categoryService.deleteCategory(id);
+        Map<String, Object> result = new HashMap<>();
+        result.put("success", true);
+        result.put("message", "Category deleted successfully");
+        return ResponseEntity.ok(result);
     }
     
     @GetMapping("/search")
     public ResponseEntity<?> searchCategories(@RequestParam String keyword) {
-        try {
-            List<CategoryResponse> categories = categoryService.searchCategories(keyword);
-            Map<String, Object> result = new HashMap<>();
-            result.put("success", true);
-            result.put("data", categories);
-            result.put("count", categories.size());
-            return ResponseEntity.ok(result);
-        } catch (Exception e) {
-            Map<String, Object> error = new HashMap<>();
-            error.put("success", false);
-            error.put("error", "Search failed");
-            return ResponseEntity.internalServerError().body(error);
-        }
+        List<CategoryResponse> categories = categoryService.searchCategories(keyword);
+        Map<String, Object> result = new HashMap<>();
+        result.put("success", true);
+        result.put("data", categories);
+        result.put("count", categories.size());
+        return ResponseEntity.ok(result);
     }
 }
