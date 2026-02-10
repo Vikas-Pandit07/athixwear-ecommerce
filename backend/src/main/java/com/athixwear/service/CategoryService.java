@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 import com.athixwear.dto.CategoryRequest;
 import com.athixwear.dto.CategoryResponse;
 import com.athixwear.entity.Category;
+import com.athixwear.exception.DuplicateResourceException;
+import com.athixwear.exception.ResourceNotFoundException;
 import com.athixwear.repository.CategoryRepository;
 
 @Service
@@ -33,7 +35,7 @@ public class CategoryService {
 		Optional<Category> existingCategory = categoryRepository.findByCategoryName(request.getCategoryName());
 		
 		if(existingCategory.isPresent()) {
-			throw new RuntimeException("Category with name '"+request.getCategoryName()+"' already exists");		
+			throw new DuplicateResourceException("Category with name '" + request.getCategoryName() + "' already exists");
 			}
 		
 		Category category = new Category();
@@ -53,9 +55,10 @@ public class CategoryService {
     }
 
     // Get Category by ID
-    public Optional<CategoryResponse> getCategoryById(int id) {
-        return categoryRepository.findById(id)
-                .map(this::mapToResponse);
+    public CategoryResponse getCategoryById(int id) {
+        Category category = categoryRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Category not found with id: " + id));
+        return mapToResponse(category);
     }
 
     // Get Category by Name
@@ -67,14 +70,14 @@ public class CategoryService {
     // update category
     public CategoryResponse updateCategory(int id, CategoryRequest request) {
     	Category category = categoryRepository.findById(id)
-    			.orElseThrow(() -> new RuntimeException("Category not found with id: "+id));
+    			.orElseThrow(() -> new ResourceNotFoundException("Category not found with id: " + id));
     	
     	// check if category name is being changed and if new name already exists
     	if (!category.getCategoryName().equals(request.getCategoryName())) {
     		Optional<Category> existingCategory = categoryRepository.findByCategoryName(request.getCategoryName());
     		
     		if (existingCategory.isPresent() && existingCategory.get().getCategoryId() != id) {
-    			throw new RuntimeException("Category with name '"+request.getCategoryName()+"' already exists");
+    			throw new DuplicateResourceException("Category with name '" + request.getCategoryName() + "' already exists");
     		}
     	}
     	
@@ -88,7 +91,7 @@ public class CategoryService {
 //    delete category
     public void deleteCategory(int id) {
     	Category category = categoryRepository.findById(id)
-    			.orElseThrow(() -> new RuntimeException("Category with id: "+getCategoryById(id)+" not found"));
+    			.orElseThrow(() -> new ResourceNotFoundException("Category not found with id: " + id));
     	
     	categoryRepository.delete(category);
     }
