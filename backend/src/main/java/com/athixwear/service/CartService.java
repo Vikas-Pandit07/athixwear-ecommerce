@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.athixwear.dto.AddToCartRequest;
 import com.athixwear.dto.CartItemResponse;
+import com.athixwear.dto.CartSummaryResponse;
 import com.athixwear.entity.Cart;
 import com.athixwear.entity.CartItem;
 import com.athixwear.entity.Product;
@@ -22,6 +23,8 @@ import com.athixwear.repository.ProductRepository;
 
 @Service
 public class CartService {
+    private static final BigDecimal FREE_SHIPPING_LIMIT = BigDecimal.valueOf(1000);
+    private static final BigDecimal SHIPPING_CHARGE = BigDecimal.valueOf(50);
 
     private final CartRepository cartRepository;
     private final CartItemRepository cartItemRepository;
@@ -70,7 +73,7 @@ public class CartService {
         int requestedQuantity = request.getQuantity() != null ? request.getQuantity() : 1;
         
         if (currentQuantity + requestedQuantity > product.getStock()) {
-        	throw new RuntimeException("Requeste quantity exceeds available stock. A available: " + product.getStock() + " for product: " + product.getName());
+            throw new InvalidCredentialsException("Requested quantity exceeds available stock");
         }
         
         // check if product already in cart    
@@ -99,6 +102,25 @@ public class CartService {
         return cartItems.stream()
                 .map(this::convertToResponse)
                 .toList();
+    }
+
+    public CartSummaryResponse getCartSummary() {
+        List<CartItemResponse> items = getCartItems();
+        BigDecimal subtotal = items.stream()
+                .map(CartItemResponse::getTotalPrice)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal shipping = subtotal.compareTo(FREE_SHIPPING_LIMIT) > 0
+                ? BigDecimal.ZERO
+                : SHIPPING_CHARGE;
+
+        CartSummaryResponse summary = new CartSummaryResponse();
+        summary.setItems(items);
+        summary.setSubtotal(subtotal);
+        summary.setShipping(shipping);
+        summary.setTotal(subtotal.add(shipping));
+        summary.setItemCount(items.stream().mapToInt(CartItemResponse::getQuantity).sum());
+        return summary;
     }
     
     // update item quantity with stock validation
@@ -139,7 +161,7 @@ public class CartService {
         // check if item belongs to current user
         User user = getCurrentUser();
         if (!item.getCart().getUser().getUserId().equals(user.getUserId())) {
-            throw new RuntimeException("Not authorized to remove this cart item");
+            throw new InvalidCredentialsException("Not authorized to remove this cart item");
         }
         
         cartItemRepository.delete(item);
