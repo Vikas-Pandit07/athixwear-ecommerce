@@ -1,13 +1,11 @@
 package com.athixwear.controller;
 
-import java.math.BigDecimal;
-import java.util.List;
 import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.athixwear.dto.AddToCartRequest;
-import com.athixwear.dto.CartItemResponse;
+import com.athixwear.dto.CartSummaryResponse;
 import com.athixwear.dto.UpdateCartItemRequest;
 import com.athixwear.service.CartService;
 
@@ -34,21 +32,14 @@ public class CartController {
     // Get all cart items
     @GetMapping
     public ResponseEntity<?> getCart() {
-    	 List<CartItemResponse> items = cartService.getCartItems();
-
-         BigDecimal subtotal = items.stream()
-                 .map(CartItemResponse::getTotalPrice)
-                 .reduce(BigDecimal.ZERO, BigDecimal::add);
-
-         BigDecimal shipping = subtotal.compareTo(BigDecimal.valueOf(1000)) > 0
-                 ? BigDecimal.ZERO : BigDecimal.valueOf(50);
-
+         CartSummaryResponse summary = cartService.getCartSummary();
          return ResponseEntity.ok(Map.of(
                  "success", true,
-                 "items", items,
-                 "subtotal", subtotal,
-                 "shipping", shipping,
-                 "total", subtotal.add(shipping)
+                 "items", summary.getItems(),
+                 "subtotal", summary.getSubtotal(),
+                 "shipping", summary.getShipping(),
+                 "total", summary.getTotal(),
+                 "itemCount", summary.getItemCount()
          ));
     }
     
