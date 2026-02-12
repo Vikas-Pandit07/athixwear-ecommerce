@@ -6,8 +6,6 @@ import com.athixwear.dto.LoginResponse;
 import com.athixwear.dto.RegisterRequest;
 import com.athixwear.dto.RegisterResponse;
 import com.athixwear.dto.ResetPasswordRequest;
-import com.athixwear.repository.UserRepository;
-import com.athixwear.security.JwtService;
 import com.athixwear.service.AuthService;
 import com.athixwear.service.PasswordResetService;
 import com.athixwear.service.RegisterService;
@@ -32,21 +30,15 @@ public class AuthController {
     private final AuthService authService;
     private final RegisterService registerService;
     private final PasswordResetService passwordResetService;
-    private final JwtService jwtService;
-    private final UserRepository userRepository;
 
     public AuthController(
     		AuthService authService, 
     		RegisterService registerService,
-			PasswordResetService passwordResetService, 
-			JwtService jwtService, 
-			UserRepository userRepository) {
+			PasswordResetService passwordResetService) {
 		super();
 		this.authService = authService;
 		this.registerService = registerService;
 		this.passwordResetService = passwordResetService;
-		this.jwtService = jwtService;
-		this.userRepository = userRepository;
 	}
 
     // ---------------- LOGIN ----------------
@@ -79,37 +71,7 @@ public class AuthController {
     // ---------------- VERIFY AUTH ----------------
     @GetMapping("/verify")
     public ResponseEntity<?> verify(HttpServletRequest request) {
-
-        String token = null;
-        if (request.getCookies() != null) {
-            for (Cookie cookie : request.getCookies()) {
-                if ("JWT_TOKEN".equals(cookie.getName())) {
-                    token = cookie.getValue();
-                    break;
-                }
-            }
-        }
-
-        if (token != null && jwtService.isTokenValid(token)) {
-            String username = jwtService.extractUsername(token);
-
-            return userRepository.findByUsername(username)
-                    .map(user -> ResponseEntity.ok(Map.of(
-                            "authenticated", true,
-                            "username", user.getUsername(),
-                            "email", user.getEmail(),
-                            "role", user.getRole().name()
-                    )))
-                    .orElse(ResponseEntity.status(401).body(Map.of(
-                            "authenticated", false,
-                            "message", "User not found"
-                    )));
-        }
-
-        return ResponseEntity.status(401).body(Map.of(
-                "authenticated", false,
-                "message", "Invalid or expired token"
-        ));
+        return ResponseEntity.ok(authService.verifyToken(extractJwtToken(request)));
     }
     
     // ---------------- LOGOUT ----------------
@@ -143,5 +105,19 @@ public class AuthController {
 
         passwordResetService.resetPassword(request);
         return ResponseEntity.ok(Map.of("message", "Password reset successful"));
+    }
+
+    private String extractJwtToken(HttpServletRequest request) {
+        if (request.getCookies() == null) {
+            return null;
+        }
+
+        for (Cookie cookie : request.getCookies()) {
+            if ("JWT_TOKEN".equals(cookie.getName())) {
+                return cookie.getValue();
+            }
+        }
+
+        return null;
     }
 }
