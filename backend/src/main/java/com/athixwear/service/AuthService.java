@@ -9,6 +9,8 @@ import com.athixwear.security.JwtService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Map;
+
 @Service
 public class AuthService {
 
@@ -42,5 +44,22 @@ public class AuthService {
 
         String token = jwtService.generateToken(user.getUsername());
         return new LoginResponse(user.getUsername(), user.getEmail(), token);
+    }
+
+    public Map<String, Object> verifyToken(String token) {
+        if (token == null || !jwtService.isTokenValid(token)) {
+            throw new InvalidCredentialsException("Invalid or expired token");
+        }
+
+        String username = jwtService.extractUsername(token);
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new InvalidCredentialsException("User not found"));
+
+        return Map.of(
+                "authenticated", true,
+                "username", user.getUsername(),
+                "email", user.getEmail(),
+                "role", user.getRole().name()
+        );
     }
 }
