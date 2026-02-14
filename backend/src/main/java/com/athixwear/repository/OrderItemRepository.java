@@ -23,6 +23,12 @@ public interface OrderItemRepository extends JpaRepository<OrderItem, Integer> {
            "GROUP BY oi.product.productId " +
            "ORDER BY totalSold DESC")
     List<Object[]> findTopSellingProducts();
+
+    @Query("SELECT oi.product.productId, oi.product.name, SUM(oi.quantity), COALESCE(SUM(oi.totalPrice), 0) " +
+            "FROM OrderItem oi " +
+            "GROUP BY oi.product.productId, oi.product.name " +
+            "ORDER BY SUM(oi.quantity) DESC")
+    List<Object[]> findTopSellingProductsWithRevenue();
     
     // Calculate total quantity sold for a product
     @Query("SELECT COALESCE(SUM(oi.quantity), 0) FROM OrderItem oi WHERE oi.product.productId = :productId")
