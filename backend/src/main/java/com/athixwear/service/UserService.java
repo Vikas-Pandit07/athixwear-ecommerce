@@ -35,7 +35,7 @@ public class UserService {
     public User getCurrentUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth == null || !auth.isAuthenticated()) {
-            throw new ResourceNotFoundException("User not authenticated");
+            throw new InvalidCredentialsException("User not authenticated");
         }
         
         String username = auth.getName();

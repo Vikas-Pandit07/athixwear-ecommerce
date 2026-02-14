@@ -7,6 +7,8 @@ import java.util.Map;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.athixwear.exception.FileUploadException;
+import com.athixwear.exception.InvalidFileException;
 import com.cloudinary.Cloudinary;
 
 @Service
@@ -48,7 +50,7 @@ public class ImageUploadService {
 			return result.get("secure_url").toString();
 			
 		} catch (Exception e) {
-			throw new RuntimeException("Image upload failed", e);
+			throw new FileUploadException("Image upload failed");
 		}
 	}
 }

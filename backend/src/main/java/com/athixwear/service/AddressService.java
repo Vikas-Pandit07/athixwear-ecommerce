@@ -7,9 +7,9 @@ import com.athixwear.dto.AddAddressRequest;
 import com.athixwear.dto.UpdateAddressRequest;
 import com.athixwear.entity.Address;
 import com.athixwear.entity.User;
+import com.athixwear.exception.ResourceNotFoundException;
 import com.athixwear.repository.AddressRepository;
 import java.util.List;
-import java.util.Map;
 
 @Service
 public class AddressService {
@@ -55,7 +55,7 @@ public class AddressService {
         User user = userService.getCurrentUser();
         
         Address address = addressRepository.findByAddressIdAndUserUserIdAndIsActiveTrue(addressId, user.getUserId())
-            .orElseThrow(() -> new RuntimeException("Address not found"));
+            .orElseThrow(() -> new ResourceNotFoundException("Address not found"));
         
         if (request.getFullName() != null) address.setFullName(request.getFullName());
         if (request.getPhone() != null) address.setPhone(request.getPhone());
@@ -80,7 +80,7 @@ public class AddressService {
         int updated = addressRepository.deactivateAddress(addressId, user.getUserId());
         
         if (updated == 0) {
-            throw new RuntimeException("Address not found or not authorized");
+            throw new ResourceNotFoundException("Address not found or not authorized");
         }
     }
     
@@ -89,7 +89,7 @@ public class AddressService {
         User user = userService.getCurrentUser();
         
         Address address = addressRepository.findByAddressIdAndUserUserIdAndIsActiveTrue(addressId, user.getUserId())
-            .orElseThrow(() -> new RuntimeException("Address not found"));
+            .orElseThrow(() -> new ResourceNotFoundException("Address not found"));
         
         // Clear all defaults first
         addressRepository.clearDefaultAddresses(user.getUserId());

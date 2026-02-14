@@ -12,6 +12,7 @@ import com.athixwear.dto.ProductResponse;
 import com.athixwear.entity.Category;
 import com.athixwear.entity.Product;
 import com.athixwear.entity.ProductImage;
+import com.athixwear.exception.ResourceNotFoundException;
 import com.athixwear.repository.CategoryRepository;
 import com.athixwear.repository.ProductImageRepository;
 import com.athixwear.repository.ProductRepository;
@@ -42,7 +43,7 @@ public class ProductService {
 	    if (categoryName != null && !categoryName.isEmpty()) {
 
 	        Category category = categoryRepository.findByCategoryName(categoryName)
-	                .orElseThrow(() -> new RuntimeException("Category not found"));
+	                .orElseThrow(() -> new ResourceNotFoundException("Category not found"));
 
 	        products = productRepository.findByCategory(category);
 	    } else {
