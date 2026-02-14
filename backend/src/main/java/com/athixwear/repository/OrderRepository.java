@@ -43,6 +43,16 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
     // Calculate total revenue
     @Query("SELECT COALESCE(SUM(o.totalAmount), 0) FROM Order o WHERE o.paymentStatus = 'PAID'")
     BigDecimal getTotalRevenue();
+
+    @Query(value = "SELECT DATE_FORMAT(o.order_date, '%b') AS month_label, " +
+            "COALESCE(SUM(o.total_amount), 0) AS revenue " +
+            "FROM orders o " +
+            "WHERE o.payment_status = 'PAID' " +
+            "AND o.order_date >= DATE_SUB(CURDATE(), INTERVAL 6 MONTH) " +
+            "GROUP BY YEAR(o.order_date), MONTH(o.order_date), DATE_FORMAT(o.order_date, '%b') " +
+            "ORDER BY YEAR(o.order_date), MONTH(o.order_date)",
+            nativeQuery = true)
+    List<Object[]> getMonthlyRevenueLastSixMonths();
     
     // Find order by Razorpay order ID
     Optional<Order> findByRazorpayOrderId(String razorpayOrderId);
