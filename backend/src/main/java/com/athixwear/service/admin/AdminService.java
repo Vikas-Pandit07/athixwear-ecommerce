@@ -1,12 +1,19 @@
 package com.athixwear.service.admin;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+
 import com.athixwear.dto.admin.AdminStatsResponse;
+import com.athixwear.entity.Order;
 import com.athixwear.entity.OrderStatus;
 import com.athixwear.entity.Role;
+import com.athixwear.entity.User;
 import com.athixwear.repository.OrderItemRepository;
 import com.athixwear.repository.OrderRepository;
 import com.athixwear.repository.ProductRepository;
@@ -15,200 +22,205 @@ import com.athixwear.repository.UserRepository;
 @Service
 public class AdminService {
 
-	private final OrderRepository orderRepository;
-	private final UserRepository userRepository;
-	private final ProductRepository productRepository;
-	private final OrderItemRepository orderItemRepository;
-	
-	public AdminService(OrderRepository orderRepository, UserRepository userRepository,
-			ProductRepository productRepository, OrderItemRepository orderItemRepository) {
-		super();
-		this.orderRepository = orderRepository;
-		this.userRepository = userRepository;
-		this.productRepository = productRepository;
-		this.orderItemRepository = orderItemRepository;
-	}
-	
-	public AdminStatsResponse getDashboardStats() {
-		AdminStatsResponse response = new AdminStatsResponse();
-		
-		try {
-            // 1. BASIC COUNTS
-            Long customerCount = userRepository.countByRole(Role.CUSTOMER);
-            response.setTotalCustomers(customerCount != null ? customerCount : 0L);
-            
-            Long productCount = productRepository.count();
-            response.setTotalProducts(productCount != null ? productCount : 0L);
-            
-            // 2. ORDER STATISTICS
-            List<Object[]> orderStats = orderRepository.getOrderStatistics();
-            
-            response.setPendingOrders(0L);
-            response.setProcessingOrders(0L); // This combines CONFIRMED and SHIPPED
-            response.setDeliveredOrders(0L);
-            response.setCancelledOrders(0L);
-            
-            for (Object[] stat : orderStats) {
-            	OrderStatus status = (OrderStatus) stat[0];
-            	Long count = (Long) stat[1];
-            	
-            	switch (status) {
-            	 case PENDING:
-                     response.setPendingOrders(count.longValue());
-                     break;
-            	 case CONFIRMED:
-            	 case SHIPPED:
-                     response.setProcessingOrders(response.getProcessingOrders() + count.longValue());
-                     break;
-                 case DELIVERED:
-                     response.setDeliveredOrders(count.longValue());
-                     break;
-                 case CANCELLED:
-                     response.setCancelledOrders(count.longValue());
-                     break;
-            }
-           }
-            
-            response.setTotalOrders(
-                    response.getPendingOrders() + 
-                    response.getProcessingOrders() + 
-                    response.getDeliveredOrders() + 
-                    response.getCancelledOrders()
-             );
-            
-            // 3. REVENUE CALCULATIONS
-            BigDecimal totalRevenue = orderRepository.getTotalRevenue();
-            response.setTotalRevenue(totalRevenue != null ? totalRevenue : BigDecimal.ZERO);
-            
-            // Average Order Value = Total Revenue / Total Orders
-            if (response.getTotalOrders() > 0) {
-            	try {
-                    BigDecimal avgValue = response.getTotalRevenue().divide(
-                        BigDecimal.valueOf(response.getTotalOrders()), 
-                        2, 
-                        BigDecimal.ROUND_HALF_UP
-                    );
-                    response.setAverageOrderValue(avgValue);
-                } catch (ArithmeticException e) {
-                    response.setAverageOrderValue(BigDecimal.ZERO);
+    private static final int DASHBOARD_LIMIT = 10;
+    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE;
+
+    private final OrderRepository orderRepository;
+    private final UserRepository userRepository;
+    private final ProductRepository productRepository;
+    private final OrderItemRepository orderItemRepository;
+
+    public AdminService(OrderRepository orderRepository, UserRepository userRepository,
+            ProductRepository productRepository, OrderItemRepository orderItemRepository) {
+        this.orderRepository = orderRepository;
+        this.userRepository = userRepository;
+        this.productRepository = productRepository;
+        this.orderItemRepository = orderItemRepository;
+    }
+
+    public AdminStatsResponse getDashboardStats() {
+        AdminStatsResponse response = new AdminStatsResponse();
+
+        Long customerCount = userRepository.countByRole(Role.CUSTOMER);
+        response.setTotalCustomers(customerCount != null ? customerCount : 0L);
+
+        Long productCount = productRepository.count();
+        response.setTotalProducts(productCount != null ? productCount : 0L);
+
+        List<Object[]> orderStats = orderRepository.getOrderStatistics();
+        response.setPendingOrders(0L);
+        response.setProcessingOrders(0L);
+        response.setDeliveredOrders(0L);
+        response.setCancelledOrders(0L);
+
+        for (Object[] stat : orderStats) {
+            OrderStatus status = (OrderStatus) stat[0];
+            Long count = (Long) stat[1];
+
+            switch (status) {
+                case PENDING -> response.setPendingOrders(count);
+                case CONFIRMED, SHIPPED -> response.setProcessingOrders(response.getProcessingOrders() + count);
+                case DELIVERED -> response.setDeliveredOrders(count);
+                case CANCELLED -> response.setCancelledOrders(count);
+                default -> {
                 }
-            } else {
-                response.setAverageOrderValue(BigDecimal.ZERO);
             }
-            
-            // 4. CONVERSION RATE
-            if (response.getTotalCustomers() > 0) {
-            	double conversion = (response.getTotalOrders() * 100.0) / response.getTotalCustomers();
-            	response.setConversionRate(Math.min(conversion, 100.0));
-            } else {
-                response.setConversionRate(0.0);
-            }
-            
-            // 5. MONTHLY REVENUE DATA
-            response.setMonthlyRevenue(getMonthlyRevenueData());
-            
-            // 6. RECENT ORDERS
-            response.setRecentOrders(getRecentOrders());
-            
-            // 7. TOP PRODUCTS
-            response.setTopProducts(getTopProducts());
-            
-            // 8. RECENT CUSTOMERS
-            response.setRecentCustomers(getRecentCustomers());
-            
-			} catch (Exception e) {
-                // Log the error and return empty response with safe defaults
-                e.printStackTrace();
-                // Set all values to 0 to avoid null pointers
-                response.setTotalCustomers(0L);
-                response.setTotalProducts(0L);
-                response.setTotalOrders(0L);
-                response.setPendingOrders(0L);
-                response.setProcessingOrders(0L);
-                response.setDeliveredOrders(0L);
-                response.setCancelledOrders(0L);
-                response.setTotalRevenue(BigDecimal.ZERO);
-                response.setAverageOrderValue(BigDecimal.ZERO);
-                response.setConversionRate(0.0);
-            }
+        }
+
+        response.setTotalOrders(
+                response.getPendingOrders()
+                        + response.getProcessingOrders()
+                        + response.getDeliveredOrders()
+                        + response.getCancelledOrders());
+
+        BigDecimal totalRevenue = orderRepository.getTotalRevenue();
+        response.setTotalRevenue(totalRevenue != null ? totalRevenue : BigDecimal.ZERO);
+
+        if (response.getTotalOrders() > 0) {
+            response.setAverageOrderValue(
+                    response.getTotalRevenue().divide(
+                            BigDecimal.valueOf(response.getTotalOrders()),
+                            2,
+                            RoundingMode.HALF_UP));
+        } else {
+            response.setAverageOrderValue(BigDecimal.ZERO);
+        }
+
+        if (response.getTotalCustomers() > 0) {
+            double conversion = (response.getTotalOrders() * 100.0) / response.getTotalCustomers();
+            response.setConversionRate(Math.min(conversion, 100.0));
+        } else {
+            response.setConversionRate(0.0);
+        }
+
+        response.setMonthlyRevenue(getMonthlyRevenueData());
+        response.setRecentOrders(getRecentOrders());
+        response.setTopProducts(getTopProducts());
+        response.setRecentCustomers(getRecentCustomers());
+
         return response;
     }
-	
-	private List<AdminStatsResponse.MonthlyRevenue> getMonthlyRevenueData() {
-        // This would query database for last 6 months revenue
-        // Simplified for example:
-        return List.of(
-            createMonthlyRevenue("Jan", 120000),
-            createMonthlyRevenue("Feb", 150000),
-            createMonthlyRevenue("Mar", 180000),
-            createMonthlyRevenue("Apr", 160000),
-            createMonthlyRevenue("May", 190000),
-            createMonthlyRevenue("Jun", 210000)
-        );
+
+    public List<AdminStatsResponse.MonthlyRevenue> getMonthlyRevenueData() {
+        return orderRepository.getMonthlyRevenueLastSixMonths().stream()
+                .map(row -> {
+                    String month = String.valueOf(row[0]);
+                    BigDecimal revenue = toBigDecimal(row[1]);
+                    return createMonthlyRevenue(month, revenue);
+                })
+                .toList();
     }
-	
-    private List<AdminStatsResponse.RecentOrder> getRecentOrders() {
-        // Query last 10 orders
-        // Simplified example:
-        return List.of(
-            createRecentOrder(1001, "John Doe", 2500, "DELIVERED", "2024-01-15"),
-            createRecentOrder(1002, "Jane Smith", 1800, "PROCESSING", "2024-01-14")
-           
-        );
+
+    public List<AdminStatsResponse.RecentOrder> getRecentOrders() {
+        List<Order> recentOrders = orderRepository.findAll(
+                PageRequest.of(0, DASHBOARD_LIMIT, Sort.by(Sort.Direction.DESC, "orderDate")))
+                .getContent();
+
+        return recentOrders.stream()
+                .map(order -> createRecentOrder(
+                        order.getOrderId(),
+                        order.getUser() != null ? order.getUser().getUsername() : "Unknown",
+                        order.getTotalAmount(),
+                        order.getOrderStatus().name(),
+                        order.getOrderDate() != null ? order.getOrderDate().toLocalDate().format(DATE_FORMATTER) : ""))
+                .toList();
     }
-    
-    private List<AdminStatsResponse.TopProduct> getTopProducts() {
-        // Simplified example:
-        return List.of(
-            createTopProduct(101, "White Foxo t-shirt", 56, 23000),
-            createTopProduct(102, "Red Snecker", 25, 40000)
-        );
+
+    public List<AdminStatsResponse.TopProduct> getTopProducts() {
+        return orderItemRepository.findTopSellingProductsWithRevenue().stream()
+                .limit(DASHBOARD_LIMIT)
+                .map(row -> {
+                    Integer productId = ((Number) row[0]).intValue();
+                    String productName = String.valueOf(row[1]);
+                    Integer soldCount = ((Number) row[2]).intValue();
+                    BigDecimal revenue = toBigDecimal(row[3]);
+                    return createTopProduct(productId, productName, soldCount, revenue);
+                })
+                .toList();
     }
-    
-    private List<AdminStatsResponse.RecentCustomer> getRecentCustomers() {
-        // Simplified example:
-        return List.of(
-            createRecentCustomer(10, "John Doe", "john@gmail.com", "2026-01-25", 3),
-            createRecentCustomer(11, "Merry Franso", "merry@gmail.com", "2026-01-25", 2)
-        );
+
+    public List<AdminStatsResponse.RecentCustomer> getRecentCustomers() {
+        List<User> customers = userRepository.findByRole(
+                Role.CUSTOMER,
+                PageRequest.of(0, DASHBOARD_LIMIT, Sort.by(Sort.Direction.DESC, "createdAt")));
+
+        return customers.stream()
+                .map(customer -> {
+                    int orderCount = Math.toIntExact(orderRepository.countByUserUserId(customer.getUserId()));
+                    String joinDate = customer.getCreatedAt() != null
+                            ? customer.getCreatedAt().toLocalDate().format(DATE_FORMATTER)
+                            : "";
+
+                    return createRecentCustomer(
+                            customer.getUserId(),
+                            customer.getUsername(),
+                            customer.getEmail(),
+                            joinDate,
+                            orderCount);
+                })
+                .toList();
     }
-    
-    private AdminStatsResponse.MonthlyRevenue createMonthlyRevenue(String month, int revenue) {
-    	AdminStatsResponse.MonthlyRevenue mr = new AdminStatsResponse.MonthlyRevenue();
-    	mr.setMonth(month);
-    	mr.setRevenue(BigDecimal.valueOf(revenue));
-    	return mr;
+
+    private BigDecimal toBigDecimal(Object value) {
+        if (value == null) {
+            return BigDecimal.ZERO;
+        }
+        if (value instanceof BigDecimal bigDecimal) {
+            return bigDecimal;
+        }
+        if (value instanceof Number number) {
+            return BigDecimal.valueOf(number.doubleValue());
+        }
+        return new BigDecimal(value.toString());
     }
-	
-    private AdminStatsResponse.RecentOrder createRecentOrder(Integer id, String name, 
-        int amount, String status, String date) {
-    	AdminStatsResponse.RecentOrder ro = new AdminStatsResponse.RecentOrder();
-    	ro.setOrderId(id);
-		ro.setCustomerName(name);
-		ro.setAmount(BigDecimal.valueOf(amount));
-		ro.setStatus(status);
-		ro.setDate(date);
-		return ro;
-	 }
-    
-    private AdminStatsResponse.TopProduct createTopProduct(Integer id, String name, 
-            int soldCount, int revenue) {
-        	AdminStatsResponse.TopProduct topProduct = new AdminStatsResponse.TopProduct();
-        	topProduct.setProductId(id);
-        	topProduct.setProductName(name);
-        	topProduct.setSoldCount(soldCount);
-    		topProduct.setRevenue(BigDecimal.valueOf(revenue));
-    		return topProduct;
+
+    private AdminStatsResponse.MonthlyRevenue createMonthlyRevenue(String month, BigDecimal revenue) {
+        AdminStatsResponse.MonthlyRevenue monthlyRevenue = new AdminStatsResponse.MonthlyRevenue();
+        monthlyRevenue.setMonth(month);
+        monthlyRevenue.setRevenue(revenue);
+        return monthlyRevenue;
     }
-    
-    private AdminStatsResponse.RecentCustomer createRecentCustomer(Integer id, String name, 
-             String email, String joinDate, Integer orders) {
-        	AdminStatsResponse.RecentCustomer recentCustomer = new AdminStatsResponse.RecentCustomer();
-        	recentCustomer.setCustomerId(id);
-        	recentCustomer.setName(name);
-        	recentCustomer.setEmail(email);
-        	recentCustomer.setJoinDate(joinDate);
-        	recentCustomer.setOrderCount(orders);
-    		return recentCustomer;
+
+    private AdminStatsResponse.RecentOrder createRecentOrder(
+            Integer id,
+            String customerName,
+            BigDecimal amount,
+            String status,
+            String date) {
+        AdminStatsResponse.RecentOrder recentOrder = new AdminStatsResponse.RecentOrder();
+        recentOrder.setOrderId(id);
+        recentOrder.setCustomerName(customerName);
+        recentOrder.setAmount(amount);
+        recentOrder.setStatus(status);
+        recentOrder.setDate(date);
+        return recentOrder;
+    }
+
+    private AdminStatsResponse.TopProduct createTopProduct(
+            Integer id,
+            String name,
+            Integer soldCount,
+            BigDecimal revenue) {
+        AdminStatsResponse.TopProduct topProduct = new AdminStatsResponse.TopProduct();
+        topProduct.setProductId(id);
+        topProduct.setProductName(name);
+        topProduct.setSoldCount(soldCount);
+        topProduct.setRevenue(revenue);
+        return topProduct;
+    }
+
+    private AdminStatsResponse.RecentCustomer createRecentCustomer(
+            Integer id,
+            String name,
+            String email,
+            String joinDate,
+            Integer orders) {
+        AdminStatsResponse.RecentCustomer recentCustomer = new AdminStatsResponse.RecentCustomer();
+        recentCustomer.setCustomerId(id);
+        recentCustomer.setName(name);
+        recentCustomer.setEmail(email);
+        recentCustomer.setJoinDate(joinDate);
+        recentCustomer.setOrderCount(orders);
+        return recentCustomer;
     }
 }
