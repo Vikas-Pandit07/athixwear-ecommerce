@@ -33,4 +33,16 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body(Map.of("error", ex.getMessage()));
     }
+    
+    @ExceptionHandler(InvalidFileException.class) 
+    public ResponseEntity<?> handleInvalidFile(InvalidFileException ex) {
+    	return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+    			.body(Map.of("error", ex.getMessage()));
+    }
+    
+    @ExceptionHandler(FileUploadException.class)
+    public ResponseEntity<?> handleFileUpload(FileUploadException ex) {
+    	return ResponseEntity.status(HttpStatus.BAD_GATEWAY)
+    			.body(Map.of("error", ex.getMessage()));
+    }
 }
