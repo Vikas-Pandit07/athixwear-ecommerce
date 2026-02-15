@@ -1,11 +1,5 @@
 # AthixWear 3-Hour/Day Roadmap (4 Weeks)
 
-## Daily Time Box
-- `0:00 - 0:20` Plan + review yesterday
-- `0:20 - 2:10` Build one focused feature
-- `2:10 - 2:40` Test/debug
-- `2:40 - 3:00` Commit/push + progress notes
-
 ## Week 1: Core Stability
 - [ ] Day 1: Audit remaining mock logic and generic exceptions
 - [ ] Day 2: Replace generic exceptions with typed exceptions
@@ -41,25 +35,4 @@
 - [ ] Day 26: Backup + restore drill
 - [ ] Day 27: Full staging dry run (real user journey)
 - [ ] Day 28: Production deploy + smoke tests + hotfix window
-
-## Priority (Do in this order)
-### P0 (Must before launch)
-- [ ] Payment correctness
-- [ ] Inventory consistency (no overselling)
-- [ ] Basic order lifecycle
-- [ ] Security basics (auth validation/rate limit)
-- [ ] Critical tests
-- [ ] Staging deploy validation
-
-### P1 (First month after launch)
-- [ ] Admin analytics depth
-- [ ] Coupons/tax/shipping rules
-- [ ] Email/notification polish
-- [ ] Performance tuning and indexing
-
-### P2 (Scale phase)
-- [ ] Advanced observability
-- [ ] Fraud controls
-- [ ] Deeper SEO improvements
-- [ ] Feature flags/release controls
 
