@@ -14,6 +14,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.format.DateTimeFormatter;
 import java.util.Map;
 import java.util.Optional;
 
@@ -60,7 +61,13 @@ public class UserService {
         response.setUsername(user.getUsername());
         response.setEmail(user.getEmail());
         response.setRole(user.getRole().name());
-        response.setJoinDate("Member since 2024");
+        
+        DateTimeFormatter fmt = DateTimeFormatter.ISO_DATE;
+        if (user.getCreatedAt() != null) {
+        	response.setJoinDate("Member since " + user.getCreatedAt().toLocalDate().format(fmt));
+        } else {
+        	response.setJoinDate("");
+        }
         return response;
     }
 

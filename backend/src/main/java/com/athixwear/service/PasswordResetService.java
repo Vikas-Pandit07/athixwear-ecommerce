@@ -1,12 +1,12 @@
 package com.athixwear.service;
 
 import java.time.LocalDateTime;
-import java.util.Map;
 import java.util.UUID;
 
 import com.athixwear.exception.InvalidCredentialsException;
 import com.athixwear.exception.ResourceNotFoundException;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -26,6 +26,8 @@ public class PasswordResetService {
 	private final PasswordResetTokenRepository tokenRepository;
 	private final JavaMailSender mailSender;
 	private final PasswordEncoder passwordEncoder;
+	@Value("${app.frontend-url}")
+	private String frontendUrl;
 	
 	public PasswordResetService(
 			UserRepository userRepository, 
@@ -88,6 +90,7 @@ public class PasswordResetService {
 	
 	private void sendResetEmail(String toEmail, String token) {
 		try {
+			String resetLink = frontendUrl + "/reset-password?token=" + token;
             SimpleMailMessage message = new SimpleMailMessage();
             message.setTo(toEmail);
             message.setSubject("AthixWear - Password Reset");
@@ -95,7 +98,7 @@ public class PasswordResetService {
                     "Hello,\n\n" +
                             "You have requested to reset your password for AthixWear.\n\n" +
                             "Click the link below to reset your password:\n" +
-                            "http://localhost:5173/athixwear-ecommerce/reset-password?token=" + token + "\n\n" +
+                            resetLink + "\n\n" +
                             "This link will expire in 24 hours.\n\n" +
                             "If you didn't request this, please ignore this email.\n\n" +
                             "Best regards,\n" +

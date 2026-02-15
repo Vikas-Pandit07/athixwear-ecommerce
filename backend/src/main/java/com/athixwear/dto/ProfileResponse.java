@@ -7,6 +7,7 @@ public class ProfileResponse {
 	private String email;
 	private String role;
 	private String joinDate;
+	
 	public Integer getUserId() {
 		return userId;
 	}
@@ -38,6 +39,4 @@ public class ProfileResponse {
 		this.joinDate = joinDate;
 	}
 	
-	
-
 }
