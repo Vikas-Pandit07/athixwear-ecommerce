@@ -7,7 +7,7 @@ public class CartItemResponse {
 	private Integer cartItemId;
 	private Integer productId;
 	private String productName;
-	private String prodctImage;
+	private String productImage;
 	private BigDecimal price;
 	private Integer quantity;
 	private BigDecimal totalPrice;
@@ -29,11 +29,11 @@ public class CartItemResponse {
 	public void setProductName(String productName) {
 		this.productName = productName;
 	}
-	public String getProdctImage() {
-		return prodctImage;
+	public String getProductImage() {
+		return productImage;
 	}
-	public void setProdctImage(String prodctImage) {
-		this.prodctImage = prodctImage;
+	public void setProductImage(String productImage) {
+		this.productImage = productImage;
 	}
 	public BigDecimal getPrice() {
 		return price;

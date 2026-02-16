@@ -200,10 +200,10 @@ public class CartService {
         List<ProductImage> images = productImageRepository.findByProduct_ProductId(item.getProduct().getProductId());
         
         if (!images.isEmpty()) {
-            response.setProdctImage(images.get(0).getImageUrl());
+            response.setProductImage(images.get(0).getImageUrl());
         } else {
             // default image if no product image
-            response.setProdctImage("https://images.unsplash.com/photo-1556821840-3a63f95609a7?q=80&w=600");
+            response.setProductImage("https://images.unsplash.com/photo-1556821840-3a63f95609a7?q=80&w=600");
         }
         
         return response;
