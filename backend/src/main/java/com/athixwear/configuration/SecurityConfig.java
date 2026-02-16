@@ -39,7 +39,7 @@ public class SecurityConfig {
                     .requestMatchers("/api/admin/**").hasRole("ADMIN")
                     
                     // User endpoints - require authentication
-                    .requestMatchers("/api/user/**", "/api/cart/**", "/api/orders/**").authenticated()
+                    .requestMatchers("/api/user/**", "/api/cart/**", "/api/orders/**", "/api/payments/**").authenticated()
                     
                     // All other requests need authentication
                     .anyRequest().authenticated()
