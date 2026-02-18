@@ -45,4 +45,10 @@ public class GlobalExceptionHandler {
     	return ResponseEntity.status(HttpStatus.BAD_GATEWAY)
     			.body(Map.of("error", ex.getMessage()));
     }
+
+    @ExceptionHandler(PaymentGatewayException.class)
+    public ResponseEntity<?> handlePaymentGateway(PaymentGatewayException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_GATEWAY)
+                .body(Map.of("error", ex.getMessage()));
+    }
 }
