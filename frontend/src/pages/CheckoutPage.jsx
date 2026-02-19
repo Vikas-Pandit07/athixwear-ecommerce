@@ -1,12 +1,37 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../assets/css/checkout.css";
+import { createPaymentOrder, verifyPayment } from "../api/paymentService";
+import {
+  addUserAddress,
+  deleteUserAddress,
+  getUserAddresses,
+} from "../api/addressService";
+import { checkoutOrder } from "../api/orderService";
+import { useCart } from "../context/CartContext";
 
 const formatPrice = (price) => {
   if (!price) return "₹0";
   if (typeof price === "number") return `₹${price.toLocaleString("en-IN")}`;
   return price;
 };
+
+const loadRazorpayScript = () =>
+  new Promise((resolve) => {
+    const existingScript = document.querySelector(
+      'script[src="https://checkout.razorpay.com/v1/checkout.js"]',
+    );
+    if (existingScript) {
+      resolve(true);
+      return;
+    }
+
+    const script = document.createElement("script");
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.onload = () => resolve(true);
+    script.onerror = () => resolve(false);
+    document.body.appendChild(script);
+  });
 
 const CheckoutPage = () => {
   const [step, setStep] = useState(1);
@@ -23,29 +48,19 @@ const CheckoutPage = () => {
     isDefault: false,
   });
   const [paymentMethod, setPaymentMethod] = useState("COD");
-  const [orderSummary, setOrderSummary] = useState(null);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ type: "", text: "" });
+  const { items, subtotal, shipping, total } = useCart();
   const navigate = useNavigate();
 
   useEffect(() => {
     fetchAddresses();
-    fetchOrderSummary();
   }, []);
 
   const fetchAddresses = async () => {
     try {
-      const response = await fetch("http://localhost:9090/api/user/addresses", {
-        method: "GET",
-        credentials: "include",
-        headers: {
-          Accept: "application/json",
-        },
-      });
-
-      const data = await response.json();
-
-      if (response.ok && data.success) {
+      const data = await getUserAddresses();
+      if (data.success) {
         const addressesData = data.addresses || [];
         setAddresses(addressesData);
 
@@ -71,29 +86,6 @@ const CheckoutPage = () => {
     } catch (err) {
       console.error("Error fetching addresses:", err);
       setMessage({ type: "error", text: "Failed to load addresses" });
-    }
-  };
-
-  const fetchOrderSummary = async () => {
-    try {
-      const response = await fetch("http://localhost:9090/api/cart", {
-        method: "GET",
-        credentials: "include",
-      });
-
-      const data = await response.json();
-
-      if (response.ok && data.success) {
-        setOrderSummary(data);
-      } else {
-        setMessage({
-          type: "error",
-          text: data.error || "Failed to load cart",
-        });
-      }
-    } catch (err) {
-      console.error("Error fetching order summary:", err);
-      setMessage({ type: "error", text: "Failed to load cart" });
     }
   };
 
@@ -132,19 +124,8 @@ const CheckoutPage = () => {
 
     try {
       setLoading(true);
-      const response = await fetch("http://localhost:9090/api/user/addresses", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify(newAddress),
-      });
-
-      const data = await response.json();
-
-      if (response.ok && data.success) {
+      const data = await addUserAddress(newAddress);
+      if (data.success) {
         setMessage({
           type: "success",
           text: data.message || "Address added successfully",
@@ -169,7 +150,10 @@ const CheckoutPage = () => {
       }
     } catch (err) {
       console.error("Error adding address:", err);
-      setMessage({ type: "error", text: "Network error. Please try again." });
+      setMessage({
+        type: "error",
+        text: err.message || "Network error. Please try again.",
+      });
     } finally {
       setLoading(false);
     }
@@ -181,40 +165,32 @@ const CheckoutPage = () => {
       return;
     }
 
-    if (!orderSummary?.items || orderSummary.items.length === 0) {
+    if (!items || items.length === 0) {
       setMessage({ type: "error", text: "Your cart is empty" });
       return;
     }
 
     try {
       setLoading(true);
-      const response = await fetch(
-        "http://localhost:9090/api/orders/checkout",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-          },
-          credentials: "include",
-          body: JSON.stringify({
-            addressId: selectedAddress,
-            paymentMethod: paymentMethod,
-          }),
-        },
-      );
+      const data = await checkoutOrder({
+        addressId: selectedAddress,
+        paymentMethod,
+      });
 
-      const data = await response.json();
+      if (data.orderId) {
+        if (paymentMethod === "COD") {
+          setMessage({
+            type: "success",
+            text: data.message || "Order placed successfully!",
+          });
 
-      if (response.ok && data.orderId) {
-        setMessage({
-          type: "success",
-          text: data.message || "Order placed successfully!",
-        });
+          setTimeout(() => {
+            navigate(`/order-confirmation/${data.orderId}`);
+          }, 1000);
+          return;
+        }
 
-        setTimeout(() => {
-          navigate(`/order-confirmation/${data.orderId}`);
-        }, 1000);
+        await initiateRazorpayPayment(data.orderId);
       } else {
         setMessage({
           type: "error",
@@ -223,9 +199,111 @@ const CheckoutPage = () => {
       }
     } catch (err) {
       console.error("Error placing order:", err);
-      setMessage({ type: "error", text: "Network error. Please try again." });
+      setMessage({
+        type: "error",
+        text: err.message || "Network error. Please try again.",
+      });
     } finally {
+      if (paymentMethod === "COD") {
+        setLoading(false);
+      }
+    }
+  };
+
+  const initiateRazorpayPayment = async (internalOrderId) => {
+    const isRazorpayLoaded = await loadRazorpayScript();
+    if (!isRazorpayLoaded) {
       setLoading(false);
+      setMessage({
+        type: "error",
+        text: "Unable to load payment gateway. Please try again.",
+      });
+      return;
+    }
+
+    try {
+      const paymentOrder = await createPaymentOrder(internalOrderId);
+
+      const options = {
+        key: paymentOrder.keyId,
+        amount: paymentOrder.amount,
+        currency: paymentOrder.currency || "INR",
+        name: "AthixWear",
+        description: `Order #${paymentOrder.internalOrderId}`,
+        order_id: paymentOrder.razorpayOrderId,
+        prefill: {
+          name: selectedAddressObj?.fullName || "",
+          contact: selectedAddressObj?.phone || "",
+        },
+        theme: {
+          color: "#111111",
+        },
+        modal: {
+          ondismiss: function () {
+            setLoading(false);
+            setMessage({
+              type: "error",
+              text: "Payment cancelled. You can retry your payment.",
+            });
+          },
+        },
+        handler: async function (razorpayResponse) {
+          try {
+            const verifyResult = await verifyPayment({
+              internalOrderId: paymentOrder.internalOrderId,
+              razorpayOrderId: razorpayResponse.razorpay_order_id,
+              razorpayPaymentId: razorpayResponse.razorpay_payment_id,
+              razorpaySignature: razorpayResponse.razorpay_signature,
+            });
+
+            if (verifyResult.verified) {
+              setMessage({
+                type: "success",
+                text: verifyResult.message || "Payment verified successfully",
+              });
+              setTimeout(() => {
+                navigate(`/order-confirmation/${paymentOrder.internalOrderId}`);
+              }, 800);
+            } else {
+              setMessage({
+                type: "error",
+                text: verifyResult.message || "Payment verification failed",
+              });
+            }
+          } catch (verifyError) {
+            console.error("Payment verification failed:", verifyError);
+            setMessage({
+              type: "error",
+              text:
+                verifyError.message ||
+                "Payment verification failed. Please contact support.",
+            });
+          } finally {
+            setLoading(false);
+          }
+        },
+      };
+
+      const razorpay = new window.Razorpay(options);
+      razorpay.on("payment.failed", function (response) {
+        setLoading(false);
+        setMessage({
+          type: "error",
+          text:
+            response?.error?.description ||
+            "Payment failed. Please retry your payment.",
+        });
+      });
+
+      razorpay.open();
+      setLoading(false);
+    } catch (paymentError) {
+      console.error("Payment initialization error:", paymentError);
+      setLoading(false);
+      setMessage({
+        type: "error",
+        text: paymentError.message || "Failed to initialize payment",
+      });
     }
   };
 
@@ -234,17 +312,8 @@ const CheckoutPage = () => {
       return;
 
     try {
-      const response = await fetch(
-        `http://localhost:9090/api/user/addresses/${addressId}`,
-        {
-          method: "DELETE",
-          credentials: "include",
-        },
-      );
-
-      const data = await response.json();
-
-      if (response.ok && data.success) {
+      const data = await deleteUserAddress(addressId);
+      if (data.success) {
         setMessage({
           type: "success",
           text: data.message || "Address deleted successfully",
@@ -266,25 +335,13 @@ const CheckoutPage = () => {
       }
     } catch (err) {
       console.error("Error deleting address:", err);
-      setMessage({ type: "error", text: "Failed to delete address" });
+      setMessage({ type: "error", text: err.message || "Failed to delete address" });
     }
   };
 
   const summary = calculateSummary();
 
   function calculateSummary() {
-    if (!orderSummary) {
-      return {
-        subtotal: 0,
-        shipping: 0,
-        total: 0,
-      };
-    }
-
-    const subtotal = orderSummary.subtotal || orderSummary.totalAmount || 0;
-    const shipping = subtotal >= 1000 ? 0 : 50;
-    const total = subtotal + shipping;
-
     return {
       subtotal: subtotal,
       shipping: shipping,
@@ -632,7 +689,7 @@ const CheckoutPage = () => {
                 <div className="review-section">
                   <h3>Order Items</h3>
                   <div className="review-items">
-                    {orderSummary?.items?.map((item) => (
+                    {items?.map((item) => (
                       <div
                         key={item.cartItemId || item.productId}
                         className="review-item"
@@ -712,10 +769,10 @@ const CheckoutPage = () => {
               </div>
             )}
 
-            {orderSummary?.items && orderSummary.items.length > 0 && (
+            {items && items.length > 0 && (
               <div className="cart-preview">
-                <h4>Items ({orderSummary.items.length})</h4>
-                {orderSummary.items.slice(0, 3).map((item) => (
+                <h4>Items ({items.length})</h4>
+                {items.slice(0, 3).map((item) => (
                   <div key={item.cartItemId} className="preview-item">
                     <img
                       src={
@@ -733,9 +790,9 @@ const CheckoutPage = () => {
                     </div>
                   </div>
                 ))}
-                {orderSummary.items.length > 3 && (
+                {items.length > 3 && (
                   <p className="more-items">
-                    +{orderSummary.items.length - 3} more items
+                    +{items.length - 3} more items
                   </p>
                 )}
               </div>
