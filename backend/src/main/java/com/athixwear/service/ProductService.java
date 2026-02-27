@@ -35,6 +35,11 @@ public class ProductService {
 		this.categoryRepository = categoryRepository;
 	}
 	
+	public ProductResponse getProductById(Integer productId) {
+		Product product = productRepository.findById(productId)
+				.orElseThrow(() -> new ResourceNotFoundException("Product not found with id"));
+		return mapToResponse(product);
+	}
 	
 	public List<ProductResponse> getProducts(String categoryName) {
 		
