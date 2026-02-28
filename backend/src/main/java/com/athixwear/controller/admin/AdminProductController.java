@@ -37,8 +37,9 @@ public class AdminProductController {
 	}
 	
     @PutMapping("/{productId}")
-    public ResponseEntity<?> updateProduct(@PathVariable Integer productId
-                                    
+    public ResponseEntity<?> updateProduct(@PathVariable Integer productId) {
+    	
+        return ResponseEntity.ok(Map.of("success", true, "message", "product updated"));                      
     }
 	
 	@DeleteMapping("/{productId}")
