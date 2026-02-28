@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.athixwear.dto.CreateProductRequest;
+import com.athixwear.dto.UpdateProductRequest;
 import com.athixwear.service.admin.AdminProductService;
 
 import jakarta.validation.Valid;
@@ -37,9 +38,10 @@ public class AdminProductController {
 	}
 	
     @PutMapping("/{productId}")
-    public ResponseEntity<?> updateProduct(@PathVariable Integer productId) {
+    public ResponseEntity<?> updateProduct(@PathVariable Integer productId,
+    										@RequestBody UpdateProductRequest request) {
     	
-        return ResponseEntity.ok(Map.of("success", true, "message", "product updated"));                      
+        return ResponseEntity.ok(Map.of("success", true, "product", adminProductService.updateProduct(productId, request)));                      
     }
 	
 	@DeleteMapping("/{productId}")

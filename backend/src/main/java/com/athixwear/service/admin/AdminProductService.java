@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 
 import com.athixwear.dto.CreateProductRequest;
 import com.athixwear.dto.ProductResponse;
+import com.athixwear.dto.UpdateProductRequest;
 import com.athixwear.entity.Category;
 import com.athixwear.entity.Product;
 import com.athixwear.entity.ProductImage;
@@ -44,7 +45,7 @@ public class AdminProductService {
 		return mapToResponse(savedProduct);
 	}
 	
-	public ProductResponse updateProduct(Integer productId, CreateProductRequest request) {
+	public ProductResponse updateProduct(Integer productId, UpdateProductRequest request) {
 		Product product = productRepository.findById(productId)
 				.orElseThrow(() -> new ResourceNotFoundException("Product not found"));
 		

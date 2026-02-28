@@ -135,14 +135,14 @@ const ProductPage = () => {
               type="number" 
               placeholder="Min" 
               value={filters.priceRange[0]}
-              onChange={(e) => handleFilterChange('priceRange', [e.target.value, filters.priceRange[1]])}
+              onChange={(e) => handleFilterChange(Number(e.target.value, filters.priceRange[1]))}
             />
             <span>to</span>
             <input 
               type="number" 
               placeholder="Max" 
               value={filters.priceRange[1]}
-              onChange={(e) => handleFilterChange('priceRange', [filters.priceRange[0], e.target.value])}
+              onChange={(e) => handleFilterChange(Number[filters.priceRange[0], e.target.value])}
             />
           </div>
         </div>
